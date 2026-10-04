@@ -24,6 +24,12 @@ function parseState(raw: string | null): AppState {
     if (parsed?.version !== 1 || !parsed.policy || !Array.isArray(parsed.events)) {
       return createSeed();
     }
+    const seen = new Set<string>();
+    parsed.events = parsed.events.filter((event) => {
+      if (!event?.id || seen.has(event.id)) return false;
+      seen.add(event.id);
+      return true;
+    });
     return parsed;
   } catch {
     return createSeed();

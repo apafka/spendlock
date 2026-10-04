@@ -27,8 +27,8 @@ export function Dashboard() {
 
   return (
     <div className="flex flex-1 flex-col">
-      <header className="border-b border-rule">
-        <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-5 py-4 sm:px-8">
+      <header className="sticky top-0 z-20 border-b border-rule bg-paper/90 backdrop-blur">
+        <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-5 py-3 sm:px-8">
           <Link href="/" className="flex items-center gap-2.5">
             <SpendlockMark />
             <span className="font-serif text-xl tracking-tight">Spendlock</span>
@@ -63,15 +63,15 @@ export function Dashboard() {
         </div>
       ) : null}
 
-      <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-6 px-5 py-8 sm:px-8">
+      <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-5 px-5 py-6 sm:px-8">
         <div>
           <p className="text-sm font-medium uppercase tracking-[0.16em] text-muted">
             Local demo
           </p>
-          <h1 className="mt-2 font-serif text-4xl tracking-tight text-ink">
+          <h1 className="mt-1 font-serif text-4xl tracking-tight text-ink">
             Policy dashboard
           </h1>
-          <p className="mt-3 max-w-2xl text-[16px] leading-7 text-muted">
+          <p className="mt-2 max-w-2xl text-[16px] leading-7 text-muted">
             Fund the policy. Cap the day. Allow only these merchants. Pause
             everything. The log tells you what would have happened.
           </p>
@@ -103,8 +103,8 @@ export function Dashboard() {
         </section>
 
         <section className="grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
-          <PolicyControls key={formEpoch} app={app} />
-          <TrySpend key={formEpoch} app={app} />
+          <PolicyControls key={`policy-${formEpoch}`} app={app} />
+          <TrySpend key={`spend-${formEpoch}`} app={app} />
         </section>
 
         <SpendLog app={app} />

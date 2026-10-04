@@ -50,17 +50,14 @@ function atHoursAgo(hours: number): string {
   return new Date(Date.now() - hours * 60 * 60 * 1000).toISOString();
 }
 
-function event(
-  partial: Omit<SpendEvent, "id"> & { id: string },
-): SpendEvent {
-  return partial;
+function event(partial: Omit<SpendEvent, "id">): SpendEvent {
+  return { ...partial, id: crypto.randomUUID() };
 }
 
 export function createSeed(): AppState {
   const todaySpent = 420 + 680 + 1800 + 310;
   const events: SpendEvent[] = [
     event({
-      id: "e8",
       agentId: "deploy-bot",
       agentName: "Deploy Bot",
       merchant: "cloud.lambdalabs.com",
@@ -71,7 +68,6 @@ export function createSeed(): AppState {
       reason: reasonDailyCap(DEFAULT_DAILY_CAP_CENTS, todaySpent),
     }),
     event({
-      id: "e7",
       agentId: "cursor-research",
       agentName: "Cursor Research",
       merchant: "api.openai.com",
@@ -82,7 +78,6 @@ export function createSeed(): AppState {
       reason: REASONS.allowed,
     }),
     event({
-      id: "e6",
       agentId: "invoice-scout",
       agentName: "Invoice Scout",
       merchant: "api.stripe.com",
@@ -93,7 +88,6 @@ export function createSeed(): AppState {
       reason: REASONS.notAllowlisted,
     }),
     event({
-      id: "e5",
       agentId: "invoice-scout",
       agentName: "Invoice Scout",
       merchant: "www.midjourney.com",
@@ -104,7 +98,6 @@ export function createSeed(): AppState {
       reason: REASONS.notAllowlisted,
     }),
     event({
-      id: "e4",
       agentId: "deploy-bot",
       agentName: "Deploy Bot",
       merchant: "cloud.lambdalabs.com",
@@ -115,7 +108,6 @@ export function createSeed(): AppState {
       reason: REASONS.allowed,
     }),
     event({
-      id: "e3",
       agentId: "cursor-research",
       agentName: "Cursor Research",
       merchant: "api.anthropic.com",
@@ -126,7 +118,6 @@ export function createSeed(): AppState {
       reason: REASONS.allowed,
     }),
     event({
-      id: "e2",
       agentId: "cursor-research",
       agentName: "Cursor Research",
       merchant: "api.openai.com",
@@ -137,7 +128,6 @@ export function createSeed(): AppState {
       reason: REASONS.allowed,
     }),
     event({
-      id: "e1",
       agentId: "deploy-bot",
       agentName: "Deploy Bot",
       merchant: "cloud.lambdalabs.com",
@@ -148,7 +138,6 @@ export function createSeed(): AppState {
       reason: REASONS.allowed,
     }),
     event({
-      id: "e0",
       agentId: "cursor-research",
       agentName: "Cursor Research",
       merchant: "api.openai.com",
