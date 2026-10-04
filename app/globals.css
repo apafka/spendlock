@@ -1,0 +1,82 @@
+@import "tailwindcss";
+
+:root {
+  --paper: #f3eee4;
+  --paper-2: #e8e0d0;
+  --card: #fbf7ef;
+  --ink: #1c1914;
+  --muted: #5e574d;
+  --rule: #d4c9b4;
+  --pine: #243f34;
+  --pine-deep: #182b23;
+  --brick: #9d3a22;
+  --brick-soft: #f3ddd4;
+  --ok-soft: #dce8e0;
+  --focus: #243f34;
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-paper-2: var(--paper-2);
+  --color-card: var(--card);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-rule: var(--rule);
+  --color-pine: var(--pine);
+  --color-pine-deep: var(--pine-deep);
+  --color-brick: var(--brick);
+  --color-brick-soft: var(--brick-soft);
+  --color-ok-soft: var(--ok-soft);
+  --font-sans: var(--font-geist-sans);
+  --font-serif: var(--font-newsreader);
+  --font-mono: var(--font-geist-mono);
+}
+
+* {
+  border-color: var(--rule);
+}
+
+html {
+  background: var(--paper);
+}
+
+body {
+  background:
+    radial-gradient(1200px 500px at 10% -10%, #fffaf0 0%, transparent 55%),
+    radial-gradient(900px 420px at 100% 0%, #e7efe8 0%, transparent 40%),
+    var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  min-height: 100%;
+}
+
+::selection {
+  background: #d7e4db;
+  color: var(--ink);
+}
+
+a {
+  color: inherit;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+input,
+select,
+textarea {
+  background: #fffdf8;
+  border: 1px solid var(--rule);
+  color: var(--ink);
+}
+
+input:focus,
+select:focus,
+textarea:focus,
+button:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
