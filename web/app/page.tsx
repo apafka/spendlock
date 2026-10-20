@@ -165,7 +165,7 @@ export default function HomePage() {
               </p>
               <a
                 href={`mailto:${CONTACT}?subject=Spendlock%20setup%20install`}
-                className="mt-8 inline-flex rounded-full bg-card px-5 py-3 text-sm font-medium text-pine hover:bg-paper"
+                className="mt-8 inline-flex rounded-full bg-card px-5 py-3 text-sm font-medium text-pine-deep hover:bg-paper"
               >
                 Email {CONTACT}
               </a>

@@ -59,8 +59,10 @@ body {
   color: var(--ink);
 }
 
-a {
-  color: inherit;
+@layer base {
+  a {
+    color: inherit;
+  }
 }
 
 button,
