@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 
-const CONTACT = "TODO@example.com";
+const CONTACT = "pafka@hey.com";
 
 export default function HomePage() {
   return (
@@ -170,7 +170,7 @@ export default function HomePage() {
                 Email {CONTACT}
               </a>
               <p className="mt-3 text-xs text-card/60">
-                Placeholder address — replace before publishing. Do not send real funds.
+                Testnet setup only. Do not send real funds.
               </p>
             </article>
           </div>

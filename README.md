@@ -12,7 +12,7 @@ Broad agent-payment platforms want to be the bank, the identity layer, and the m
 
 | Path | What it is |
 |---|---|
-| `web/` | Founder landing page (`/`) and a **no-wallet interactive demo** (`/demo`) |
+| `web/` | Founder landing page and a **no-wallet interactive demo** (GitHub Pages at `/spendlock/` and `/spendlock/demo/`) |
 | `contracts/` | `Spendlock.sol` vault + Foundry tests (and ResultEscrow, which the vault can pay) |
 | `agents/` | MCP tools (`spendlock_status`, `spendlock_spend`) and an owner CLI |
 | `SPENDLOCK.md` | Plain-English guide to the onchain rules |
@@ -27,8 +27,14 @@ npm install
 npm run dev
 ```
 
-- [http://localhost:3000](http://localhost:3000) — landing (headline, why now, pricing)
-- [http://localhost:3000/demo](http://localhost:3000/demo) — owner dashboard, simulated in the browser
+The app is built with `basePath: /spendlock` so local matches GitHub Pages:
+
+- [http://localhost:3000/spendlock/](http://localhost:3000/spendlock/) — landing (headline, why now, pricing)
+- [http://localhost:3000/spendlock/demo/](http://localhost:3000/spendlock/demo/) — owner dashboard, simulated in the browser
+
+Public site (after merge to `main`): [https://apafka.github.io/spendlock/](https://apafka.github.io/spendlock/) and [https://apafka.github.io/spendlock/demo/](https://apafka.github.io/spendlock/demo/).
+
+GitHub Pages is a static export of `web/` (`.github/workflows/pages.yml`). One-time repo setting if the first Actions deploy does not enable Pages by itself: **Settings → Pages → Source = GitHub Actions**.
 
 On the demo you will see three agents with per-agent caps. Try, in any order:
 
@@ -100,4 +106,4 @@ Use a **local anvil or Base Sepolia** vault. Put a test key in env, not in git. 
 
 Not a token. Not a bank. Not mainnet. Not a hosted production backend. Cards and real USDC settlement are later, if ever.
 
-Contact for a done-for-you setup: `TODO@example.com` (placeholder).
+Contact for a done-for-you setup: [pafka@hey.com](mailto:pafka@hey.com).

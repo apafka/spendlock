@@ -13,8 +13,8 @@ echo "== contract tests =="
 echo
 echo "Browser demo (no wallet, simulated state):"
 echo "  cd web && npm install && npm run dev"
-echo "  open http://localhost:3000          landing"
-echo "  open http://localhost:3000/demo     owner dashboard"
+echo "  open http://localhost:3000/spendlock/       landing"
+echo "  open http://localhost:3000/spendlock/demo/  owner dashboard"
 
 if [ -z "${KEEP:-}" ]; then
   echo
