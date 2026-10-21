@@ -5,7 +5,7 @@
   "description": "Fantasy trading league on Hyperliquid (points only, no real money)",
   "type": "module",
   "scripts": {
-    "test": "node --test test/",
+    "test": "node --test test/game.test.js",
     "pool": "node scripts/build-pool.js",
     "snapshot": "node scripts/snapshot.js",
     "score": "node scripts/update-scores.js",
