@@ -1,0 +1,68 @@
+name: Market tests
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+    paths:
+      - "market/**"
+      - ".github/workflows/market.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  agents:
+    name: market/agents npm test
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: market/agents
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: market/agents/package-lock.json
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+      - name: Install and test
+        run: |
+          npm ci
+          npm test
+
+  game:
+    name: market/game npm test
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    defaults:
+      run:
+        working-directory: market/game
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Test
+        run: npm test
+
+  contracts:
+    name: market/contracts forge test
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: market/contracts
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+      - name: Test
+        run: forge test

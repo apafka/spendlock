@@ -1,0 +1,63 @@
+  deployed MockUSDC at 0x5fbdb2315678afecb367f032d93f642f64180aa3
+  deployed ResultEscrow at 0xe7f1725e7734ce288f8367e1bb143e90bb3f0512
+Saved deployments/local.json
+  deployed Spendlock at 0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0 (owner 0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc, token 0x5fbdb2315678afecb367f032d93f642f64180aa3)
+Saved deployments/local.json
+
+== Spendlock vault 0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0 (owner 0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc)
+
+OWNER   funds the vault with $100 (play USDC)
+OWNER   vault balance $100.00
+OWNER   agent A 0x976EA74026E726554dB657fA54763abd0C3a0aa9: $20/tx, $20/day, $60 total, owner approval above $15, expires in 30 days, may ONLY pay ResultEscrow
+OWNER   agent B 0x14dC79964da2C08b23698B3D3cc7Ca32193d9955: $10/tx, $20/day, $40 total, approval above $5, may only pay the data API 0x00000000000000000000000000000000000da7a1
+AGENT A MCP tools: spendlock_status, spendlock_spend
+AGENT A status: can spend $20.00 now, $20.00 left today, $60.00 budget; allowed: 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512 (ResultEscrow)
+
+-- 1) buy 5 verified wallets ($15) through ResultEscrow
+AGENT A EXECUTED  $15.00 -> ResultEscrow job #1  tx 0x114f1328…
+          FEED    47471 leaderboard rows -> 20 candidates (month PnL >= $10k, account $50k–$10M, skips market makers and vaults) -> /workspace/mvp/agents/data/jobs/orders/1792405459164-d5099c29/candidates.csv
+          WORKER  pre-check: 5/20 candidates pass the job rules
+          WORKER  submitted 5 leads for job #1 (file hash 0xbdb0e172c0…)
+          VERIFIER settled job #1: 5/5 verified -> worker $14.70, fee $0.30, refund to client $0.00
+        delivered: 5 verified wallets, $15 paid; escrow paid worker $14.70, fee $0.30, refund to VAULT $0.00
+VAULT   balance $85.00
+
+-- 2) same day, another $15 buy
+AGENT A REJECTED  $15.00 -> 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512: "over daily limit"  tx 0x85cac49b… (rejection stored onchain)
+
+-- 3) pay a random address
+AGENT A REJECTED  $3.00 -> 0x000000000000000000000000000000000000dEaD: "recipient not allowed"  tx 0x5313d092… (rejection stored onchain)
+
+-- 4) next UTC day: buy 6 wallets ($18 > $15 approval threshold)
+AGENT A PENDING   $18.00 waits for the owner (request #1)  tx 0x7db19f55…
+VAULT   balance $85.00 (nothing moved yet)
+OWNER   approves request #1: EXECUTED  $18.00 -> ResultEscrow job #2  tx 0xb8b040a7…
+          FEED    47471 leaderboard rows -> 24 candidates (month PnL >= $10k, account $50k–$10M, skips market makers and vaults) -> /workspace/mvp/agents/data/jobs/orders/1792405506850-54a5a7df/candidates.csv
+          WORKER  pre-check: 5/24 candidates pass the job rules
+          WORKER  submitted 5 leads for job #2 (file hash 0x9ee5f07af4…)
+          VERIFIER settled job #2: 5/5 verified -> worker $14.70, fee $0.30, refund to client $3.00
+        delivered: 5 verified wallets, $15 paid; escrow paid worker $14.70, fee $0.30, refund to VAULT $3.00
+VAULT   balance $70.00
+
+-- 5) agent B (library call, no MCP) pays the data API
+AGENT B EXECUTED  $4.00 -> 0x00000000000000000000000000000000000da7A1  tx 0x1bec5613…
+AGENT B PENDING   $8.00 waits for the owner (request #2)  tx 0xb7f40cdd… -> left for the owner in the dashboard
+
+-- 6) kill switch
+OWNER   flips the global kill switch
+AGENT A REJECTED  $3.00 -> 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512: "kill switch on"  tx 0xf7158dac… (rejection stored onchain)
+AGENT B REJECTED  $1.00 -> 0x00000000000000000000000000000000000da7A1: "kill switch on"  tx 0xcb89a9e4… (rejection stored onchain)
+AGENT A status: killSwitch=true, spendable now $0.00, budget left $27.00
+
+== Onchain audit trail: 16 events — 3 Spent, 4 SpendRejected, 2 SpendRequested, 5 policy changes
+   block  11  Spent          agent A  $ 15.00   buy 5 verified HL wallets
+   block  14  SpendRejected  agent A  $ 15.00  "over daily limit" buy 5 more
+   block  15  SpendRejected  agent A  $  3.00  "recipient not allowed" tip a stranger
+   block  17  SpendRequested agent A  $ 18.00   buy 6 wallets (needs approval)
+   block  18  Spent          agent A  $ 18.00   buy 6 wallets (needs approval)
+   block  21  Spent          agent B  $  4.00   market data, 1 day
+   block  22  SpendRequested agent B  $  8.00   premium data feed
+   block  24  SpendRejected  agent A  $  3.00  "kill switch on" one more wallet
+   block  25  SpendRejected  agent B  $  1.00  "kill switch on" tiny call
+== Vault: $66.00 (funded $100; agent spends and escrow refunds all accounted for onchain)
+anvil still running (pid 52461). Dashboard: cd web && npm run dev, then open http://localhost:3000/spendlock

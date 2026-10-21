@@ -1,0 +1,9 @@
+{
+  "title": "Profitable active Hyperliquid perp traders (last 30 days)",
+  "note": "Main niche. Every number is re-checked against the public Hyperliquid info API. The BESS spec stays as an example of the company-leads type.",
+  "resultType": "hl-wallets/v1",
+  "maxItems": 30,
+  "pricePerItemUSDC": 3,
+  "deadlineHours": 24,
+  "rules": { "windowDays": 30, "minRealizedPnlUsd": 10000, "minTrades": 20, "minAccountValueUsd": 50000, "claimTolerance": 0.1 }
+}

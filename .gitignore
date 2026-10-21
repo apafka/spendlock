@@ -12,18 +12,30 @@ node_modules/
 web/.next/
 web/out/
 web/next-env.d.ts
+market/web/.next/
+market/web/out/
+market/web/next-env.d.ts
 
 # foundry
 contracts/out/
 contracts/cache/
 contracts/broadcast/
+market/contracts/out/
+market/contracts/cache/
+market/contracts/broadcast/
 
 # env / secrets — never commit keys
 .env
 .env.*
 !.env.example
+!.env.local.example
 agents/.env
 *.pem
+
+# market generated runtime files
+market/agents/data/jobs/
+market/deployments/
+
 
 # misc
 .DS_Store

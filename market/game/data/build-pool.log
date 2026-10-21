@@ -1,0 +1,4 @@
+FEED    47471 leaderboard rows -> 100 candidates (month PnL >= $10k, account $50k–$10M, skips market makers and vaults) -> /workspace/mvp/game/data/candidates.csv
+CHECK   5 wallets got no API answer; retrying in 60s
+CHECK   100 candidates -> 75 usable (23 at the 10k-fill cap), 23 review, 25 fail (251s)
+POOL    50 traders for 2026-W43 -> /workspace/mvp/game/data/pool.json (salaries 5-14)
