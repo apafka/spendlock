@@ -1,0 +1,14 @@
+{
+  "title": "European BESS developers/buyers with public evidence",
+  "note": "Candidate set from public news sources (see source_url per row). Rules here = option B+C+D from NEXT.md.",
+  "resultType": "company-leads/v1",
+  "countries": ["EE","LV","LT","FI","SE","NO","DK","DE","PL","NL","BE","FR","ES","PT","IT","AT","CZ","SI","CH","GB","IE","RO"],
+  "maxItems": 30,
+  "pricePerItemUSDC": 2,
+  "deadlineHours": 24,
+  "rules": {
+    "homepageKeywords": ["battery", "batteries", "storage", "bess", "speicher", "akumul", "salvest"],
+    "requireSource": true,
+    "sourceKeywords": ["bess", "battery", "energy storage"]
+  }
+}

@@ -1,0 +1,22 @@
+  deployed MockUSDC at 0x5fbdb2315678afecb367f032d93f642f64180aa3
+  deployed ResultEscrow at 0xe7f1725e7734ce288f8367e1bb143e90bb3f0512
+Saved deployments/local.json
+BUYER   connected; tools: get_offer, buy_verified_wallets, get_job_report
+BUYER   offer: "Profitable active Hyperliquid perp traders (last 30 days)" at $3/wallet on local
+BUYER   buying 5 wallets (budget $15)...
+  CLIENT  posted job #1: "Profitable active Hyperliquid perp traders (last 30 days)" — locked $15 USDC (5 x $3), verifier 0x90F79bf6EB2c4f870365E785982E1f101E93b906
+  FEED    47408 leaderboard rows -> 20 candidates (month PnL >= $10k, account $50k–$10M, skips market makers and vaults) -> /workspace/mvp/agents/data/jobs/orders/1792375968242-8ee0b017/candidates.csv
+  WORKER  pre-check: 5/20 candidates pass the job rules
+  WORKER  submitted 5 leads for job #1 (file hash 0xe843ff99e8…)
+  VERIFIER settled job #1: 5/5 verified -> worker $14.70, fee $0.30, refund to client $0.00
+BUYER   got 5 verified wallets for $15 (0 review, 0 fail, refunded):
+  ✔ 0xad59ed47c226987cf458a63428ca10887773ba81  account value $9,144,532 (min $50000); 41 trades in 30d (min 20); realized PnL $15,114 (min $10000)
+  ✔ 0x939f95036d2e7b6d7419ec072bf9d967352204d2  account value $7,252,390 (min $50000); 1437 trades in 30d (min 20); realized PnL $157,436 (min $10000)
+  ✔ 0x08c14b32c8a48894e4b933090ebcc9ce33b21135  account value $1,947,271 (min $50000); 745 trades in 30d (min 20); realized PnL $194,538 (min $10000)
+  ✔ 0x77ee3604adbdefa66a817b3cf776412a6613a018  account value $5,500,520 (min $50000); 5998 trades in 30d (min 20); realized PnL $2,287,592 (min $10000)
+  ✔ 0x3ee505ba316879d246a8fd2b3d7ee63b51b44fab  account value $2,275,449 (min $50000); 120 trades in 30d (min 20); realized PnL $27,846 (min $10000)
+  CLIENT         0x70997970C51812dc3A010C7d01b50e0d17dc79C8  $985.00
+  X402_BUYER     0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65  $0.00
+  WORKER         0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC  $14.70
+  FEE_RECIPIENT  0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266  $0.30
+  ESCROW         0xe7f1725e7734ce288f8367e1bb143e90bb3f0512  $0.00

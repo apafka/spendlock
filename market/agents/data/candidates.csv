@@ -1,0 +1,11 @@
+company,domain,country
+Fortum,fortum.com,FI
+RWE,rwe.com,DE
+Vattenfall,vattenfall.com,SE
+Elering,elering.ee,EE
+Enel,enel.com,IT
+Orsted,orsted.com,DK
+Iberdrola,iberdrola.com,ES
+Made-up company (should fail DNS),eesti-bess-buyer-fake-9137.eu,EE
+RWE duplicate (should fail),www.rwe.com,DE
+Tesla (outside Europe),tesla.com,US

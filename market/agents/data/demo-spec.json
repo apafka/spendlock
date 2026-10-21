@@ -1,0 +1,9 @@
+{
+  "title": "DEMO: European energy companies with a live domain",
+  "note": "Demo data only. These are well-known utilities, NOT verified BESS buyers.",
+  "resultType": "company-leads/v1",
+  "countries": ["EE","LV","LT","FI","SE","NO","DK","DE","PL","NL","BE","FR","ES","PT","IT","AT","CZ","IE"],
+  "maxItems": 10,
+  "pricePerItemUSDC": 4,
+  "deadlineHours": 24
+}

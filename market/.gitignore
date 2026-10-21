@@ -1,0 +1,13 @@
+node_modules/
+.next/
+contracts/out/
+contracts/cache/
+contracts/broadcast/
+.env
+.env.local
+agents/data/jobs/
+deployments/local.json
+*.tsbuildinfo
+game/data/*.lock/
+game/data/*.tmp
+game/data/candidates.csv

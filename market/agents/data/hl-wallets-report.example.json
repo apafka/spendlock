@@ -1,0 +1,1220 @@
+{
+  "jobId": 1,
+  "title": "Profitable active Hyperliquid perp traders (last 30 days)",
+  "resultType": "hl-wallets/v1",
+  "rules": {
+    "windowDays": 30,
+    "minRealizedPnlUsd": 10000,
+    "minTrades": 20,
+    "minAccountValueUsd": 50000,
+    "claimTolerance": 0.1
+  },
+  "submitted": 30,
+  "verifiedCount": 30,
+  "reviewCount": 0,
+  "failedCount": 0,
+  "note": "pass = paid; fail and review = refunded to client. Review items are listed for a human to check.",
+  "items": [
+    {
+      "company": "0x08c14b32",
+      "domain": "0x08c14b32c8a48894e4b933090ebcc9ce33b21135",
+      "address": "0x08c14b32c8a48894e4b933090ebcc9ce33b21135",
+      "status": "pass",
+      "passed": true,
+      "reason": "all checks passed",
+      "checks": [
+        {
+          "rule": "valid_address",
+          "ok": true,
+          "detail": "0x08c14b32c8a48894e4b933090ebcc9ce33b21135"
+        },
+        {
+          "rule": "unique",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "rule": "not_excluded",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "rule": "account_value",
+          "ok": true,
+          "detail": "account value $2,959,525 (min $50000)"
+        },
+        {
+          "rule": "min_trades",
+          "ok": true,
+          "detail": "865 trades in 30d (min 20)"
+        },
+        {
+          "rule": "min_pnl",
+          "ok": true,
+          "detail": "realized PnL $263,356 (min $10000)"
+        }
+      ]
+    },
+    {
+      "company": "0x3ee505ba",
+      "domain": "0x3ee505ba316879d246a8fd2b3d7ee63b51b44fab",
+      "address": "0x3ee505ba316879d246a8fd2b3d7ee63b51b44fab",
+      "status": "pass",
+      "passed": true,
+      "reason": "all checks passed",
+      "checks": [
+        {
+          "rule": "valid_address",
+          "ok": true,
+          "detail": "0x3ee505ba316879d246a8fd2b3d7ee63b51b44fab"
+        },
+        {
+          "rule": "unique",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "rule": "not_excluded",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "rule": "account_value",
+          "ok": true,
+          "detail": "account value $2,620,134 (min $50000)"
+        },
+        {
+          "rule": "min_trades",
+          "ok": true,
+          "detail": "120 trades in 30d (min 20)"
+        },
+        {
+          "rule": "min_pnl",
+          "ok": true,
+          "detail": "realized PnL $27,846 (min $10000)"
+        }
+      ]
+    },
+    {
+      "company": "0x13da9d69",
+      "domain": "0x13da9d69a9b8a28495ade07d3ff1c61d024808be",
+      "address": "0x13da9d69a9b8a28495ade07d3ff1c61d024808be",
+      "status": "pass",
+      "passed": true,
+      "reason": "all checks passed",
+      "checks": [
+        {
+          "rule": "valid_address",
+          "ok": true,
+          "detail": "0x13da9d69a9b8a28495ade07d3ff1c61d024808be"
+        },
+        {
+          "rule": "unique",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "rule": "not_excluded",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "rule": "account_value",
+          "ok": true,
+          "detail": "account value $2,031,062 (min $50000)"
+        },
+        {
+          "rule": "min_trades",
+          "ok": true,
+          "detail": "2965 trades in 30d (min 20)"
+        },
+        {
+          "rule": "min_pnl",
+          "ok": true,
+          "detail": "realized PnL $4,939,696 (min $10000)"
+        }
+      ]
+    },
+    {
+      "company": "0xf29c6bc1",
+      "domain": "0xf29c6bc1147a841519b382459a6d7a373c6b9971",
+      "address": "0xf29c6bc1147a841519b382459a6d7a373c6b9971",
+      "status": "pass",
+      "passed": true,
+      "reason": "all checks passed",
+      "checks": [
+        {
+          "rule": "valid_address",
+          "ok": true,
+          "detail": "0xf29c6bc1147a841519b382459a6d7a373c6b9971"
+        },
+        {
+          "rule": "unique",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "rule": "not_excluded",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "rule": "account_value",
+          "ok": true,
+          "detail": "account value $3,986,789 (min $50000)"
+        },
+        {
+          "rule": "min_trades",
+          "ok": true,
+          "detail": "897 trades in 30d (min 20)"
+        },
+        {
+          "rule": "min_pnl",
+          "ok": true,
+          "detail": "realized PnL $4,821,947 (min $10000)"
+        }
+      ]
+    },
+    {
+      "company": "0x53969485",
+      "domain": "0x53969485d7422b35c7fe5a4025498f9b69268b79",
+      "address": "0x53969485d7422b35c7fe5a4025498f9b69268b79",
+      "status": "pass",
+      "passed": true,
+      "reason": "all checks passed",
+      "checks": [
+        {
+          "rule": "valid_address",
+          "ok": true,
+          "detail": "0x53969485d7422b35c7fe5a4025498f9b69268b79"
+        },
+        {
+          "rule": "unique",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "rule": "not_excluded",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "rule": "account_value",
+          "ok": true,
+          "detail": "account value $2,943,935 (min $50000)"
+        },
+        {
+          "rule": "min_trades",
+          "ok": true,
+          "detail": "4560 trades in 30d (min 20)"
+        },
+        {
+          "rule": "min_pnl",
+          "ok": true,
+          "detail": "realized PnL $648,272 (min $10000)"
+        }
+      ]
+    },
+    {
+      "company": "0xbd334a55",
+      "domain": "0xbd334a55db91617545e8d1b09941e036ad8e4200",
+      "address": "0xbd334a55db91617545e8d1b09941e036ad8e4200",
+      "status": "pass",
+      "passed": true,
+      "reason": "all checks passed",
+      "checks": [
+        {
+          "rule": "valid_address",
+          "ok": true,
+          "detail": "0xbd334a55db91617545e8d1b09941e036ad8e4200"
+        },
+        {
+          "rule": "unique",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "rule": "not_excluded",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "rule": "account_value",
+          "ok": true,
+          "detail": "account value $9,042,321 (min $50000)"
+        },
+        {
+          "rule": "min_trades",
+          "ok": true,
+          "detail": "2464 trades in 30d (min 20)"
+        },
+        {
+          "rule": "min_pnl",
+          "ok": true,
+          "detail": "realized PnL $4,157,129 (min $10000)"
+        }
+      ]
+    },
+    {
+      "company": "0xaeaab54b",
+      "domain": "0xaeaab54bbf65bfd6efed7d2eb68372298e3c2416",
+      "address": "0xaeaab54bbf65bfd6efed7d2eb68372298e3c2416",
+      "status": "pass",
+      "passed": true,
+      "reason": "all checks passed",
+      "checks": [
+        {
+          "rule": "valid_address",
+          "ok": true,
+          "detail": "0xaeaab54bbf65bfd6efed7d2eb68372298e3c2416"
+        },
+        {
+          "rule": "unique",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "rule": "not_excluded",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "rule": "account_value",
+          "ok": true,
+          "detail": "account value $1,975,767 (min $50000)"
+        },
+        {
+          "rule": "min_trades",
+          "ok": true,
+          "detail": "268 trades in 30d (min 20)"
+        },
+        {
+          "rule": "min_pnl",
+          "ok": true,
+          "detail": "realized PnL $2,449,992 (min $10000)"
+        }
+      ]
+    },
+    {
+      "company": "0xab961d7c",
+      "domain": "0xab961d7c42bbcd454a54b342bd191a8f090219e6",
+      "address": "0xab961d7c42bbcd454a54b342bd191a8f090219e6",
+      "status": "pass",
+      "passed": true,
+      "reason": "all checks passed",
+      "checks": [
+        {
+          "rule": "valid_address",
+          "ok": true,
+          "detail": "0xab961d7c42bbcd454a54b342bd191a8f090219e6"
+        },
+        {
+          "rule": "unique",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "rule": "not_excluded",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "rule": "account_value",
+          "ok": true,
+          "detail": "account value $2,071,458 (min $50000)"
+        },
+        {
+          "rule": "min_trades",
+          "ok": true,
+          "detail": "4626 trades in 30d (min 20)"
+        },
+        {
+          "rule": "min_pnl",
+          "ok": true,
+          "detail": "realized PnL $2,248,984 (min $10000)"
+        }
+      ]
+    },
+    {
+      "company": "0x77ee3604",
+      "domain": "0x77ee3604adbdefa66a817b3cf776412a6613a018",
+      "address": "0x77ee3604adbdefa66a817b3cf776412a6613a018",
+      "status": "pass",
+      "passed": true,
+      "reason": "all checks passed",
+      "checks": [
+        {
+          "rule": "valid_address",
+          "ok": true,
+          "detail": "0x77ee3604adbdefa66a817b3cf776412a6613a018"
+        },
+        {
+          "rule": "unique",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "rule": "not_excluded",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "rule": "account_value",
+          "ok": true,
+          "detail": "account value $4,709,101 (min $50000)"
+        },
+        {
+          "rule": "min_trades",
+          "ok": true,
+          "detail": "5604 trades in 30d (min 20)"
+        },
+        {
+          "rule": "min_pnl",
+          "ok": true,
+          "detail": "realized PnL $2,223,142 (min $10000)"
+        }
+      ]
+    },
+    {
+      "company": "0x72154676",
+      "domain": "0x721546769b86db633fcbd5e3a08a0e6343042e3c",
+      "address": "0x721546769b86db633fcbd5e3a08a0e6343042e3c",
+      "status": "pass",
+      "passed": true,
+      "reason": "all checks passed",
+      "checks": [
+        {
+          "rule": "valid_address",
+          "ok": true,
+          "detail": "0x721546769b86db633fcbd5e3a08a0e6343042e3c"
+        },
+        {
+          "rule": "unique",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "rule": "not_excluded",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "rule": "account_value",
+          "ok": true,
+          "detail": "account value $8,707,027 (min $50000)"
+        },
+        {
+          "rule": "min_trades",
+          "ok": true,
+          "detail": "1335 trades in 30d (min 20)"
+        },
+        {
+          "rule": "min_pnl",
+          "ok": true,
+          "detail": "realized PnL $1,778,703 (min $10000)"
+        }
+      ]
+    },
+    {
+      "company": "0x0c4a3a7a",
+      "domain": "0x0c4a3a7ac74d43732f9b5ea507f01ab72a381b19",
+      "address": "0x0c4a3a7ac74d43732f9b5ea507f01ab72a381b19",
+      "status": "pass",
+      "passed": true,
+      "reason": "all checks passed",
+      "checks": [
+        {
+          "rule": "valid_address",
+          "ok": true,
+          "detail": "0x0c4a3a7ac74d43732f9b5ea507f01ab72a381b19"
+        },
+        {
+          "rule": "unique",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "rule": "not_excluded",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "rule": "account_value",
+          "ok": true,
+          "detail": "account value $4,394,141 (min $50000)"
+        },
+        {
+          "rule": "min_trades",
+          "ok": true,
+          "detail": "1214 trades in 30d (min 20)"
+        },
+        {
+          "rule": "min_pnl",
+          "ok": true,
+          "detail": "realized PnL $1,776,853 (min $10000)"
+        }
+      ]
+    },
+    {
+      "company": "0xf9faba57",
+      "domain": "0xf9faba57a81d1575d3e506dd3eafe7db6f2a3275",
+      "address": "0xf9faba57a81d1575d3e506dd3eafe7db6f2a3275",
+      "status": "pass",
+      "passed": true,
+      "reason": "all checks passed",
+      "checks": [
+        {
+          "rule": "valid_address",
+          "ok": true,
+          "detail": "0xf9faba57a81d1575d3e506dd3eafe7db6f2a3275"
+        },
+        {
+          "rule": "unique",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "rule": "not_excluded",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "rule": "account_value",
+          "ok": true,
+          "detail": "account value $1,054,201 (min $50000)"
+        },
+        {
+          "rule": "min_trades",
+          "ok": true,
+          "detail": "3132 trades in 30d (min 20)"
+        },
+        {
+          "rule": "min_pnl",
+          "ok": true,
+          "detail": "realized PnL $1,549,370 (min $10000)"
+        }
+      ]
+    },
+    {
+      "company": "0x5f94a519",
+      "domain": "0x5f94a51948d2376ad34a6fadfa2544e651b74b96",
+      "address": "0x5f94a51948d2376ad34a6fadfa2544e651b74b96",
+      "status": "pass",
+      "passed": true,
+      "reason": "all checks passed",
+      "checks": [
+        {
+          "rule": "valid_address",
+          "ok": true,
+          "detail": "0x5f94a51948d2376ad34a6fadfa2544e651b74b96"
+        },
+        {
+          "rule": "unique",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "rule": "not_excluded",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "rule": "account_value",
+          "ok": true,
+          "detail": "account value $4,979,529 (min $50000)"
+        },
+        {
+          "rule": "min_trades",
+          "ok": true,
+          "detail": "1100 trades in 30d (min 20)"
+        },
+        {
+          "rule": "min_pnl",
+          "ok": true,
+          "detail": "realized PnL $715,607 (min $10000)"
+        }
+      ]
+    },
+    {
+      "company": "0x668cec05",
+      "domain": "0x668cec05549105e5b05bcc779a43186735d7ea2e",
+      "address": "0x668cec05549105e5b05bcc779a43186735d7ea2e",
+      "status": "pass",
+      "passed": true,
+      "reason": "all checks passed",
+      "checks": [
+        {
+          "rule": "valid_address",
+          "ok": true,
+          "detail": "0x668cec05549105e5b05bcc779a43186735d7ea2e"
+        },
+        {
+          "rule": "unique",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "rule": "not_excluded",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "rule": "account_value",
+          "ok": true,
+          "detail": "account value $3,038,908 (min $50000)"
+        },
+        {
+          "rule": "min_trades",
+          "ok": true,
+          "detail": "3084 trades in 30d (min 20)"
+        },
+        {
+          "rule": "min_pnl",
+          "ok": true,
+          "detail": "realized PnL $456,341 (min $10000)"
+        }
+      ]
+    },
+    {
+      "company": "we love u jeff",
+      "domain": "0x1367df28c0681431b8a8f3d887576a1cad85560e",
+      "address": "0x1367df28c0681431b8a8f3d887576a1cad85560e",
+      "status": "pass",
+      "passed": true,
+      "reason": "all checks passed",
+      "checks": [
+        {
+          "rule": "valid_address",
+          "ok": true,
+          "detail": "0x1367df28c0681431b8a8f3d887576a1cad85560e"
+        },
+        {
+          "rule": "unique",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "rule": "not_excluded",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "rule": "account_value",
+          "ok": true,
+          "detail": "account value $2,027,741 (min $50000)"
+        },
+        {
+          "rule": "min_trades",
+          "ok": true,
+          "detail": "5244 trades in 30d (min 20)"
+        },
+        {
+          "rule": "min_pnl",
+          "ok": true,
+          "detail": "realized PnL $538,802 (min $10000)"
+        }
+      ]
+    },
+    {
+      "company": "0xe2823659",
+      "domain": "0xe2823659be02e0f48a4660e4da008b5e1abfdf29",
+      "address": "0xe2823659be02e0f48a4660e4da008b5e1abfdf29",
+      "status": "pass",
+      "passed": true,
+      "reason": "all checks passed",
+      "checks": [
+        {
+          "rule": "valid_address",
+          "ok": true,
+          "detail": "0xe2823659be02e0f48a4660e4da008b5e1abfdf29"
+        },
+        {
+          "rule": "unique",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "rule": "not_excluded",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "rule": "account_value",
+          "ok": true,
+          "detail": "account value $759,178 (min $50000)"
+        },
+        {
+          "rule": "min_trades",
+          "ok": true,
+          "detail": "240 trades in 30d (min 20)"
+        },
+        {
+          "rule": "min_pnl",
+          "ok": true,
+          "detail": "realized PnL $136,530 (min $10000)"
+        }
+      ]
+    },
+    {
+      "company": "0x72774e2f",
+      "domain": "0x72774e2fe1992d5da8c6e9cef73fd2ab980c0b98",
+      "address": "0x72774e2fe1992d5da8c6e9cef73fd2ab980c0b98",
+      "status": "pass",
+      "passed": true,
+      "reason": "all checks passed",
+      "checks": [
+        {
+          "rule": "valid_address",
+          "ok": true,
+          "detail": "0x72774e2fe1992d5da8c6e9cef73fd2ab980c0b98"
+        },
+        {
+          "rule": "unique",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "rule": "not_excluded",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "rule": "account_value",
+          "ok": true,
+          "detail": "account value $2,048,886 (min $50000)"
+        },
+        {
+          "rule": "min_trades",
+          "ok": true,
+          "detail": "6877 trades in 30d (min 20)"
+        },
+        {
+          "rule": "min_pnl",
+          "ok": true,
+          "detail": "realized PnL $1,005,108 (min $10000)"
+        }
+      ]
+    },
+    {
+      "company": "0x0748e296",
+      "domain": "0x0748e296e5a350ec36c8487a1cea406e1b57d4b2",
+      "address": "0x0748e296e5a350ec36c8487a1cea406e1b57d4b2",
+      "status": "pass",
+      "passed": true,
+      "reason": "all checks passed",
+      "checks": [
+        {
+          "rule": "valid_address",
+          "ok": true,
+          "detail": "0x0748e296e5a350ec36c8487a1cea406e1b57d4b2"
+        },
+        {
+          "rule": "unique",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "rule": "not_excluded",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "rule": "account_value",
+          "ok": true,
+          "detail": "account value $2,358,156 (min $50000)"
+        },
+        {
+          "rule": "min_trades",
+          "ok": true,
+          "detail": "3563 trades in 30d (min 20)"
+        },
+        {
+          "rule": "min_pnl",
+          "ok": true,
+          "detail": "realized PnL $3,100,007 (min $10000)"
+        }
+      ]
+    },
+    {
+      "company": "0xa516541e",
+      "domain": "0xa516541e599129095d14f7faf8b11ae670c837b0",
+      "address": "0xa516541e599129095d14f7faf8b11ae670c837b0",
+      "status": "pass",
+      "passed": true,
+      "reason": "all checks passed",
+      "checks": [
+        {
+          "rule": "valid_address",
+          "ok": true,
+          "detail": "0xa516541e599129095d14f7faf8b11ae670c837b0"
+        },
+        {
+          "rule": "unique",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "rule": "not_excluded",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "rule": "account_value",
+          "ok": true,
+          "detail": "account value $53,248 (min $50000)"
+        },
+        {
+          "rule": "min_trades",
+          "ok": true,
+          "detail": "927 trades in 30d (min 20)"
+        },
+        {
+          "rule": "min_pnl",
+          "ok": true,
+          "detail": "realized PnL $3,450,145 (min $10000)"
+        }
+      ]
+    },
+    {
+      "company": "0x4044570e",
+      "domain": "0x4044570e13b5184f7eb2709de25a4eb766a4794c",
+      "address": "0x4044570e13b5184f7eb2709de25a4eb766a4794c",
+      "status": "pass",
+      "passed": true,
+      "reason": "all checks passed",
+      "checks": [
+        {
+          "rule": "valid_address",
+          "ok": true,
+          "detail": "0x4044570e13b5184f7eb2709de25a4eb766a4794c"
+        },
+        {
+          "rule": "unique",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "rule": "not_excluded",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "rule": "account_value",
+          "ok": true,
+          "detail": "account value $4,282,793 (min $50000)"
+        },
+        {
+          "rule": "min_trades",
+          "ok": true,
+          "detail": "3437 trades in 30d (min 20)"
+        },
+        {
+          "rule": "min_pnl",
+          "ok": true,
+          "detail": "realized PnL $1,051,553 (min $10000)"
+        }
+      ]
+    },
+    {
+      "company": "0xd21d9318",
+      "domain": "0xd21d931890d27b6e7e2e668f27931e17698e90f1",
+      "address": "0xd21d931890d27b6e7e2e668f27931e17698e90f1",
+      "status": "pass",
+      "passed": true,
+      "reason": "all checks passed",
+      "checks": [
+        {
+          "rule": "valid_address",
+          "ok": true,
+          "detail": "0xd21d931890d27b6e7e2e668f27931e17698e90f1"
+        },
+        {
+          "rule": "unique",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "rule": "not_excluded",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "rule": "account_value",
+          "ok": true,
+          "detail": "account value $6,232,849 (min $50000)"
+        },
+        {
+          "rule": "min_trades",
+          "ok": true,
+          "detail": "1737 trades in 30d (min 20)"
+        },
+        {
+          "rule": "min_pnl",
+          "ok": true,
+          "detail": "realized PnL $1,975,931 (min $10000)"
+        }
+      ]
+    },
+    {
+      "company": "0xb69eec8f",
+      "domain": "0xb69eec8fea0081343c3b09e652ba1fa7dcf7033a",
+      "address": "0xb69eec8fea0081343c3b09e652ba1fa7dcf7033a",
+      "status": "pass",
+      "passed": true,
+      "reason": "all checks passed",
+      "checks": [
+        {
+          "rule": "valid_address",
+          "ok": true,
+          "detail": "0xb69eec8fea0081343c3b09e652ba1fa7dcf7033a"
+        },
+        {
+          "rule": "unique",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "rule": "not_excluded",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "rule": "account_value",
+          "ok": true,
+          "detail": "account value $686,891 (min $50000)"
+        },
+        {
+          "rule": "min_trades",
+          "ok": true,
+          "detail": "893 trades in 30d (min 20)"
+        },
+        {
+          "rule": "min_pnl",
+          "ok": true,
+          "detail": "realized PnL $829,684 (min $10000)"
+        }
+      ]
+    },
+    {
+      "company": "0xc298efc4",
+      "domain": "0xc298efc4785f2f282838924103509156c9578a9c",
+      "address": "0xc298efc4785f2f282838924103509156c9578a9c",
+      "status": "pass",
+      "passed": true,
+      "reason": "all checks passed",
+      "checks": [
+        {
+          "rule": "valid_address",
+          "ok": true,
+          "detail": "0xc298efc4785f2f282838924103509156c9578a9c"
+        },
+        {
+          "rule": "unique",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "rule": "not_excluded",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "rule": "account_value",
+          "ok": true,
+          "detail": "account value $5,849,342 (min $50000)"
+        },
+        {
+          "rule": "min_trades",
+          "ok": true,
+          "detail": "4417 trades in 30d (min 20)"
+        },
+        {
+          "rule": "min_pnl",
+          "ok": true,
+          "detail": "realized PnL $356,718 (min $10000)"
+        }
+      ]
+    },
+    {
+      "company": "0x5d908c88",
+      "domain": "0x5d908c88be270889c0953e7dff1c8e1d699ceea3",
+      "address": "0x5d908c88be270889c0953e7dff1c8e1d699ceea3",
+      "status": "pass",
+      "passed": true,
+      "reason": "all checks passed",
+      "checks": [
+        {
+          "rule": "valid_address",
+          "ok": true,
+          "detail": "0x5d908c88be270889c0953e7dff1c8e1d699ceea3"
+        },
+        {
+          "rule": "unique",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "rule": "not_excluded",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "rule": "account_value",
+          "ok": true,
+          "detail": "account value $2,542,790 (min $50000)"
+        },
+        {
+          "rule": "min_trades",
+          "ok": true,
+          "detail": "3936 trades in 30d (min 20)"
+        },
+        {
+          "rule": "min_pnl",
+          "ok": true,
+          "detail": "realized PnL $860,779 (min $10000)"
+        }
+      ]
+    },
+    {
+      "company": "0x8b61a50f",
+      "domain": "0x8b61a50f7091abbc7ab292d3a24b9eeb4a29c0c2",
+      "address": "0x8b61a50f7091abbc7ab292d3a24b9eeb4a29c0c2",
+      "status": "pass",
+      "passed": true,
+      "reason": "all checks passed",
+      "checks": [
+        {
+          "rule": "valid_address",
+          "ok": true,
+          "detail": "0x8b61a50f7091abbc7ab292d3a24b9eeb4a29c0c2"
+        },
+        {
+          "rule": "unique",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "rule": "not_excluded",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "rule": "account_value",
+          "ok": true,
+          "detail": "account value $1,812,751 (min $50000)"
+        },
+        {
+          "rule": "min_trades",
+          "ok": true,
+          "detail": "236 trades in 30d (min 20)"
+        },
+        {
+          "rule": "min_pnl",
+          "ok": true,
+          "detail": "realized PnL $997,411 (min $10000)"
+        }
+      ]
+    },
+    {
+      "company": "0xe09726ff",
+      "domain": "0xe09726ff25f5001f37b15049f54116cb83d7d0fe",
+      "address": "0xe09726ff25f5001f37b15049f54116cb83d7d0fe",
+      "status": "pass",
+      "passed": true,
+      "reason": "all checks passed",
+      "checks": [
+        {
+          "rule": "valid_address",
+          "ok": true,
+          "detail": "0xe09726ff25f5001f37b15049f54116cb83d7d0fe"
+        },
+        {
+          "rule": "unique",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "rule": "not_excluded",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "rule": "account_value",
+          "ok": true,
+          "detail": "account value $5,331,457 (min $50000)"
+        },
+        {
+          "rule": "min_trades",
+          "ok": true,
+          "detail": "6204 trades in 30d (min 20)"
+        },
+        {
+          "rule": "min_pnl",
+          "ok": true,
+          "detail": "realized PnL $870,788 (min $10000)"
+        }
+      ]
+    },
+    {
+      "company": "0x71038a3e",
+      "domain": "0x71038a3e5fd46ba4ca5edc81339a4d1e9e493104",
+      "address": "0x71038a3e5fd46ba4ca5edc81339a4d1e9e493104",
+      "status": "pass",
+      "passed": true,
+      "reason": "all checks passed",
+      "checks": [
+        {
+          "rule": "valid_address",
+          "ok": true,
+          "detail": "0x71038a3e5fd46ba4ca5edc81339a4d1e9e493104"
+        },
+        {
+          "rule": "unique",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "rule": "not_excluded",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "rule": "account_value",
+          "ok": true,
+          "detail": "account value $393,379 (min $50000)"
+        },
+        {
+          "rule": "min_trades",
+          "ok": true,
+          "detail": "4350 trades in 30d (min 20)"
+        },
+        {
+          "rule": "min_pnl",
+          "ok": true,
+          "detail": "realized PnL $846,363 (min $10000)"
+        }
+      ]
+    },
+    {
+      "company": "0xabdbca56",
+      "domain": "0xabdbca561f51626a217cbacdd95fcbd95b6484ac",
+      "address": "0xabdbca561f51626a217cbacdd95fcbd95b6484ac",
+      "status": "pass",
+      "passed": true,
+      "reason": "all checks passed",
+      "checks": [
+        {
+          "rule": "valid_address",
+          "ok": true,
+          "detail": "0xabdbca561f51626a217cbacdd95fcbd95b6484ac"
+        },
+        {
+          "rule": "unique",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "rule": "not_excluded",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "rule": "account_value",
+          "ok": true,
+          "detail": "account value $808,730 (min $50000)"
+        },
+        {
+          "rule": "min_trades",
+          "ok": true,
+          "detail": "141 trades in 30d (min 20)"
+        },
+        {
+          "rule": "min_pnl",
+          "ok": true,
+          "detail": "realized PnL $180,149 (min $10000)"
+        }
+      ]
+    },
+    {
+      "company": "0x5d2f4460",
+      "domain": "0x5d2f4460ac3514ada79f5d9838916e508ab39bb7",
+      "address": "0x5d2f4460ac3514ada79f5d9838916e508ab39bb7",
+      "status": "pass",
+      "passed": true,
+      "reason": "all checks passed",
+      "checks": [
+        {
+          "rule": "valid_address",
+          "ok": true,
+          "detail": "0x5d2f4460ac3514ada79f5d9838916e508ab39bb7"
+        },
+        {
+          "rule": "unique",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "rule": "not_excluded",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "rule": "account_value",
+          "ok": true,
+          "detail": "account value $4,171,924 (min $50000)"
+        },
+        {
+          "rule": "min_trades",
+          "ok": true,
+          "detail": "1077 trades in 30d (min 20)"
+        },
+        {
+          "rule": "min_pnl",
+          "ok": true,
+          "detail": "realized PnL $552,113 (min $10000)"
+        }
+      ]
+    },
+    {
+      "company": "0x58f0bf43",
+      "domain": "0x58f0bf4307c61bc7a5fe11e24fe36e64300b0d20",
+      "address": "0x58f0bf4307c61bc7a5fe11e24fe36e64300b0d20",
+      "status": "pass",
+      "passed": true,
+      "reason": "all checks passed",
+      "checks": [
+        {
+          "rule": "valid_address",
+          "ok": true,
+          "detail": "0x58f0bf4307c61bc7a5fe11e24fe36e64300b0d20"
+        },
+        {
+          "rule": "unique",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "rule": "not_excluded",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "rule": "account_value",
+          "ok": true,
+          "detail": "account value $3,508,458 (min $50000)"
+        },
+        {
+          "rule": "min_trades",
+          "ok": true,
+          "detail": "247 trades in 30d (min 20)"
+        },
+        {
+          "rule": "min_pnl",
+          "ok": true,
+          "detail": "realized PnL $2,621,133 (min $10000)"
+        }
+      ]
+    }
+  ],
+  "checkedAt": "2026-10-14T08:01:27.460Z"
+}

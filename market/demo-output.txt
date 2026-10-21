@@ -1,0 +1,68 @@
+== 1. compile + test contracts
+Suite result: ok. 14 passed; 0 failed; 0 skipped; finished in 14.54ms (16.16ms CPU time)
+== 2. test verifier rules
+# pass 5
+# fail 0
+== 3. start local chain (anvil)
+== 4. deploy
+  deployed MockUSDC at 0x5fbdb2315678afecb367f032d93f642f64180aa3
+  deployed ResultEscrow at 0xe7f1725e7734ce288f8367e1bb143e90bb3f0512
+Saved deployments/local.json
+== 5. client posts job #1: real sourced BESS candidates (data/bess-candidates.csv)
+CLIENT  posted job #1: "European BESS developers/buyers with public evidence" — locked $60 USDC (30 x $2), verifier 0x90F79bf6EB2c4f870365E785982E1f101E93b906
+-- balances after funding
+  CLIENT         0x70997970C51812dc3A010C7d01b50e0d17dc79C8  $940.00
+  WORKER         0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC  $0.00
+  FEE_RECIPIENT  0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266  $0.00
+  ESCROW         0xe7f1725e7734ce288f8367e1bb143e90bb3f0512  $60.00
+== 6. worker delivers
+WORKER  submitted 27 leads for job #1 (file hash 0x5549976ca6…)
+== 7. verifier checks + settles (live DNS, homepage + source-page checks)
+  ? Enefit (Eesti Energia)             enefit.ee              could not confirm: source blocked and site gave no keyword
+  ✔ Sunly                              sunly.ee               all checks passed
+  ✔ Evecon                             evecon.ee              all checks passed
+  ✔ Corsica Sole                       corsicasole.com        all checks passed
+  ✔ Taaleri Energia                    taaleri.com            all checks passed
+  ✔ Smartecon                          smartecon.ee           all checks passed
+  ? Ignitis Group                      ignitis.lt             could not confirm: source blocked and site gave no keyword
+  ✔ E energija Group                   e-energija.lt          all checks passed
+  ✔ NGEN Group                         ngen.si                all checks passed
+  ✔ Ingrid Capacity                    ingridcapacity.com     all checks passed
+  ✔ Mirova                             mirova.com             all checks passed
+  ✔ Nala Renewables                    nalarenewables.com     all checks passed
+  ✔ Delta Capacity                     deltacapacity.com      all checks passed
+  ✔ Covenergo                          covenergo.com          all checks passed
+  ✔ Centrica Energy                    centricaenergy.com     all checks passed
+  ✔ Grenergy                           grenergy.eu            all checks passed
+  ✔ BW ESS                             bw-ess.com             all checks passed
+  ✔ Greenvolt                          greenvolt.com          all checks passed
+  ✔ Giga Storage                       giga-storage.com       all checks passed
+  ✔ Statera Energy                     stateraenergy.co.uk    all checks passed
+  ✔ Zenobe                             zenobe.com             all checks passed
+  ✔ Eku Energy                         ekuenergy.com          all checks passed
+  ✔ Kyon Energy                        kyon-energy.de         all checks passed
+  ✔ Fidra Energy                       fidraenergy.com        all checks passed
+  ✔ LEAG                               leag.de                all checks passed
+  ✔ RWE                                rwe.com                all checks passed
+  ✔ Enel Green Power                   enelgreenpower.com     all checks passed
+  25 pass · 2 needs review (refunded) · 0 fail — report saved: /workspace/mvp/agents/data/jobs/1.report.json
+VERIFIER settled job #1: 25/27 verified -> worker $49.00, fee $1.00, refund to client $10.00
+== 8. job #2: synthetic list with planted bad rows, to show failure reasons
+CLIENT  posted job #2: "DEMO: European energy companies with a live domain" — locked $40 USDC (10 x $4), verifier 0x90F79bf6EB2c4f870365E785982E1f101E93b906
+WORKER  submitted 9 leads for job #2 (file hash 0x9518d03ca1…)
+  ✔ Fortum                             fortum.com             all checks passed
+  ✔ RWE                                rwe.com                all checks passed
+  ✔ Vattenfall                         vattenfall.com         all checks passed
+  ✔ Elering                            elering.ee             all checks passed
+  ✔ Enel                               enel.com               all checks passed
+  ✔ Orsted                             orsted.com             all checks passed
+  ✔ Iberdrola                          iberdrola.com          all checks passed
+  ✘ Made-up company (should fail DNS)  eesti-bess-buyer-fake-9137.eu domain does not resolve (no A/MX record)
+  ✘ RWE duplicate (should fail)        rwe.com                duplicate domain
+  7 pass · 0 needs review (refunded) · 2 fail — report saved: /workspace/mvp/agents/data/jobs/2.report.json
+VERIFIER settled job #2: 7/9 verified -> worker $27.44, fee $0.56, refund to client $12.00
+-- balances after both settlements
+  CLIENT         0x70997970C51812dc3A010C7d01b50e0d17dc79C8  $1922.00
+  WORKER         0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC  $76.44
+  FEE_RECIPIENT  0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266  $1.56
+  ESCROW         0xe7f1725e7734ce288f8367e1bb143e90bb3f0512  $0.00

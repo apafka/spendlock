@@ -1,0 +1,23 @@
+# Live run 2026-10-19 (times UTC; Tallinn = UTC+3)
+FEED    47471 leaderboard rows -> 100 candidates (month PnL >= $10k, account $50k–$10M, skips market makers and vaults) -> /workspace/mvp/game/data/candidates.csv
+CHECK   5 wallets got no API answer; retrying in 60s
+CHECK   100 candidates -> 75 usable (23 at the 10k-fill cap), 23 review, 25 fail (251s)
+POOL    50 traders for 2026-W43 -> /workspace/mvp/game/data/pool.json (salaries 5-14)
+WEEK    2026-W43 starts 2026-10-19T00:00:00.000Z | baseline backfill for 50/50 traders (readings from 2026-10-18T21:42:00.022Z to 2026-10-18T23:54:00.020Z)
+SNAP    live snapshot 2026-10-19T10:29:59.838Z for 50 traders
+SIM     8 simulated players drafted (salaries 41-50 / 50)
+API     POST /api/game/enter live_tester -> ok (salary 44); same name again -> "You already have a team this week."
+API     POST /api/game/enter top-5 salaries -> "Team costs 67, cap is 50."
+API     POST /api/game/enter bad wallet signature -> "Wallet signature did not verify."
+API     POST /api/game/enter wallet_wendy with a valid signature (public anvil test account) -> ok (salary 47)
+SCORE   2026-W43 at 2026-10-19T10:33:12.475Z (10s), 10 teams
+  #1 scalp_sam        +0.60%  $607,406
+  #2 basis_bea        +0.53%  $630,756
+  #3 live_tester      +0.05%  $-13,029
+  #4 wallet_wendy     -0.01%  $-2,293
+  #5 liq_larry        -0.19%  $2,492
+  #6 degen_dana       -0.36%  $-171,142
+  #7 whale_watcher    -0.43%  $-132,652
+  #8 hype_hank        -1.17%  $-76,675
+  #9 funding_fiona    -1.26%  $-854,587
+  #10 perp_pete        -2.06%  $-67,354
