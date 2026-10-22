@@ -1,11 +1,15 @@
 # Spendlock
 
-Hard spend rails for small founder agent teams: per-agent caps, a daily limit, a recipient allowlist, owner approval above a threshold, a kill switch, and a readable spend log.
+Spend limits your agent can't turn off.
 
-Broad agent-payment platforms want to be the bank, the identity layer, and the marketplace. Spendlock is Basecamp-simple: **one dashboard, hard caps, allowlist, kill switch, readable log.**
+Each agent gets its own **profile**: a spending limit, approval by default (or auto-approve under $50 / $100 / $200), a separate purchase history, and an off switch. Limits live in the team's vault, outside the agent, so a misbehaving agent cannot raise its cap or skip approval.
+
+Walmart, Stripe, Circle each enforce limits only inside their own rails. Spendlock is the cross-platform version: **one budget, one rule set, one log** for all of a team's agents, wherever they pay. Start with x402 sellers (HTTP 402 Payment Required, pay in USDC, retry with payment proof).
+
+Non-custodial: funds stay in the team's own Spendlock vault. Spendlock never holds customer money.
 
 - Settlement rail: **USDC on Base**. Testnet / local play money only. **No mainnet. No token. No real funds in this repo.**
-- Business: bootstrapped monthly team plan (placeholder **EUR 29–99**) plus paid setup installs (**from EUR 500**) for founders whose agents already spend.
+- Business: **free** (1 agent, small cap), bootstrapped **team plan EUR 29–99 / month**, optional **EUR 500** done-for-you setup.
 - The contract is **unaudited**. Never put real money in it.
 
 ## What’s in this repo
@@ -14,10 +18,9 @@ Broad agent-payment platforms want to be the bank, the identity layer, and the m
 |---|---|
 | `web/` | Founder landing page, **no-wallet owner dashboard**, and **no-wallet market demo** (GitHub Pages at `/spendlock/`, `/spendlock/demo/`, `/spendlock/market/`) |
 | `contracts/` | `Spendlock.sol` vault + Foundry tests (and ResultEscrow, which the vault can pay) |
-| `agents/` | MCP tools (`spendlock_status`, `spendlock_spend`) and an owner CLI |
+| `agents/` | MCP tools (`spendlock_status`, `spendlock_spend`, `spendlock_pay`), owner CLI, mock x402 sellers, demo |
 | `SPENDLOCK.md` | Plain-English guide to the onchain rules |
-
-`main` was an empty stub. This slice brings in the local prototype (vault, tests, MCP, owner CLI) and adds the landing page plus a simulated demo so anyone can click the rails without keys.
+| `market/` | Verified-results market (including an x402 402 endpoint) |
 
 ## Run the demo (no wallet)
 
@@ -29,22 +32,31 @@ npm run dev
 
 The app is built with `basePath: /spendlock` so local matches GitHub Pages:
 
-- [http://localhost:3000/spendlock/](http://localhost:3000/spendlock/) — landing (headline, why now, pricing)
-- [http://localhost:3000/spendlock/demo/](http://localhost:3000/spendlock/demo/) — owner dashboard, simulated in the browser
+- [http://localhost:3000/spendlock/](http://localhost:3000/spendlock/) — landing
+- [http://localhost:3000/spendlock/demo/](http://localhost:3000/spendlock/demo/) — Agent Profiles dashboard, simulated in the browser
 - [http://localhost:3000/spendlock/market/](http://localhost:3000/spendlock/market/) — pay-per-verified-wallet job, no wallet
 
 Public site (after merge to `main`): [https://apafka.github.io/spendlock/](https://apafka.github.io/spendlock/), [https://apafka.github.io/spendlock/demo/](https://apafka.github.io/spendlock/demo/), and [https://apafka.github.io/spendlock/market/](https://apafka.github.io/spendlock/market/).
 
-GitHub Pages is a static export of `web/` (`.github/workflows/pages.yml`). One-time repo setting if the first Actions deploy does not enable Pages by itself: **Settings → Pages → Source = GitHub Actions**.
+On the Agent Profiles demo you will see one card per agent. Try:
 
-On the demo you will see three agents with per-agent caps. Try, in any order:
+1. **Run Scout against all three** — price feed $0.02 and company data $0.50 paid; the $25 dataset blocked by the per-tx cap
+2. **Ops buys company data $0.50** — approval required for every purchase → waits for you
+3. **KILL SWITCH** — every profile frozen; the next spend is rejected
+4. **Pause / Delete** on a card — that agent only
 
-1. **Over the cap: $12** — Agent B is limited to $10 per payment → blocked
-2. **Pay a stranger $3** — Agent A may only pay ResultEscrow → blocked
-3. **Ask owner: $8 data feed** — Agent B’s threshold is $5 → waits for you to Approve or Reject
-4. **KILL SWITCH** — every agent frozen; the next spend is rejected
+Every action is a row in the team-wide log. Reset demo restores the seed. State lives in `localStorage` (`spendlock.demo.v3`).
 
-Every action is a row in the plain-English log. Reset demo restores the seed. State lives in `localStorage` (`spendlock.demo.v2`).
+## Run the x402 sellers demo (terminal)
+
+Three local mock sellers, one agent, one budget. Simulated play money — no anvil required.
+
+```bash
+cd agents
+npm install
+npm test          # node --test (profiles, pay, MCP, demo story)
+npm run demo      # prints the same story
+```
 
 ### Watch one market job (still no wallet)
 
@@ -77,7 +89,7 @@ Deploy refuses mainnet chain ids.
 
 ## Dogfooding from Cursor cloud agents (MCP)
 
-A founder can give each Cursor agent its own policy on the vault, then point that agent at the MCP server. The model only gets two tools. The **contract** still says no.
+A founder gives each agent a profile on the vault, then points Cursor at the MCP server. The model gets three tools. The **profile + contract** still say no.
 
 ```json
 {
@@ -86,10 +98,8 @@ A founder can give each Cursor agent its own policy on the vault, then point tha
       "command": "node",
       "args": ["agents/spendlock-mcp.js"],
       "env": {
-        "NETWORK": "local",
-        "SPENDLOCK_RPC": "http://127.0.0.1:8545",
-        "SPENDLOCK_VAULT": "0x…",
-        "SPENDLOCK_AGENT_KEY": "test-key-for-this-agent-only"
+        "SPENDLOCK_MODE": "simulated",
+        "NETWORK": "local"
       }
     }
   }
@@ -102,15 +112,16 @@ npm install
 cp .env.example .env   # fill test values; never commit .env
 ```
 
-- `spendlock_status` — remaining per tx / today / budget, pause, kill switch, pending requests
-- `spendlock_spend` — `{ to, amountUSDC, memo }` → `executed`, `pending` (owner must approve), or `rejected` with the reason
+- `spendlock_status` — profiles, remaining per tx / today / budget, pause, kill switch, pending requests, per-agent history
+- `spendlock_pay` — `{ agent, url, method?, body? }` → request the seller; on HTTP 402, check the profile **before** paying; then `paid`, `blocked` + reason, or `pending` (owner must approve)
+- `spendlock_spend` — `{ to, amountUSDC, memo }` on-chain spend (vault / local anvil)
 
-Owner side: `node agents/spendlock-owner.js status` (and `policy`, `allow`, `pause`, `kill`, `approve`, `reject`).
+Owner side: `node agents/spendlock-owner.js status` (and `profile`, `pause`, `delete`, `kill`, `queue`, `approve`, `reject`).
 
-Use a **local anvil or Base Sepolia** vault. Put a test key in env, not in git. The MCP refuses mainnet chain ids. If a cloud agent is prompt-injected, it still cannot spend past the cap, off the allowlist, or through a kill switch.
+Use **simulated** mode, a **local anvil**, or Base Sepolia. Put a test key in env, not in git. The MCP refuses mainnet chain ids. If a cloud agent is prompt-injected, it still cannot spend past the cap, off the allowlist, or through a kill switch.
 
 ## What this is not
 
-Not a token. Not a bank. Not mainnet. Not a hosted production backend. Cards and real USDC settlement are later, if ever.
+Not a token. Not a bank. Not mainnet. Not a hosted production backend. Not custody of customer money. Cards and real USDC settlement are later, if ever.
 
 Contact for a done-for-you setup: [pafka@hey.com](mailto:pafka@hey.com).

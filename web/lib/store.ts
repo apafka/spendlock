@@ -3,7 +3,7 @@
 import { createSeed } from "./seed";
 import type { AppState } from "./types";
 
-export const STORAGE_KEY = "spendlock.demo.v2";
+export const STORAGE_KEY = "spendlock.demo.v3";
 const CHANGE_EVENT = "spendlock-demo-change";
 
 let memory: AppState | null = null;
@@ -21,7 +21,7 @@ function parseState(raw: string | null): AppState {
   if (!raw) return createSeed();
   try {
     const parsed = JSON.parse(raw) as AppState;
-    if (parsed?.version !== 2 || !Array.isArray(parsed.agents) || !Array.isArray(parsed.events)) {
+    if (parsed?.version !== 3 || !Array.isArray(parsed.agents) || !Array.isArray(parsed.events)) {
       return createSeed();
     }
     return parsed;

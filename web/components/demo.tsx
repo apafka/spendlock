@@ -4,17 +4,26 @@ import Link from "next/link";
 import { FormEvent, useState } from "react";
 import { SpendlockMark } from "@/components/mark";
 import {
+  approvalRuleLabel,
   formatUsd,
+  historyFor,
   remaining,
   shortAddress,
 } from "@/lib/engine";
-import { RECIPIENTS } from "@/lib/seed";
+import { SELLERS } from "@/lib/seed";
 import { useSpendlock } from "@/lib/use-spendlock";
-import type { ApprovalRequest, LogEvent, SpendOutcome } from "@/lib/types";
+import type { Agent, ApprovalRequest, LogEvent, SpendOutcome } from "@/lib/types";
+
+type SellerRunResult = {
+  sellerId: string;
+  sellerLabel: string;
+  outcome: SpendOutcome;
+};
 
 export function DemoDashboard() {
   const app = useSpendlock();
   const [last, setLast] = useState<SpendOutcome | null>(null);
+  const [sellerRun, setSellerRun] = useState<SellerRunResult[] | null>(null);
 
   if (!app.state) {
     return (
@@ -26,6 +35,12 @@ export function DemoDashboard() {
 
   const { state } = app;
   const pending = state.requests.filter((item) => item.status === "pending");
+
+  function resetAll() {
+    app.reset();
+    setLast(null);
+    setSellerRun(null);
+  }
 
   return (
     <div className="flex flex-1 flex-col">
@@ -48,10 +63,7 @@ export function DemoDashboard() {
             </span>
             <button
               type="button"
-              onClick={() => {
-                app.reset();
-                setLast(null);
-              }}
+              onClick={resetAll}
               className="text-muted underline-offset-4 hover:text-ink hover:underline"
             >
               Reset demo
@@ -69,24 +81,23 @@ export function DemoDashboard() {
       <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-6 px-5 py-6 sm:px-8">
         <div>
           <p className="text-sm font-medium uppercase tracking-[0.16em] text-muted">
-            Simulated owner dashboard
+            Simulated owner dashboard · no wallet
           </p>
-          <h1 className="mt-1 font-serif text-4xl tracking-tight text-ink">
-            Spendlock: owner dashboard
-          </h1>
-          <p className="mt-2 max-w-2xl text-[16px] leading-7 text-muted">
-            No wallet, no keys. Play money in the browser. The rules match the contract: per-agent
-            caps, allowlist, approval above a threshold, kill switch, readable log.
+          <h1 className="mt-1 font-serif text-4xl tracking-tight text-ink">Agent Profiles</h1>
+          <p className="mt-2 max-w-3xl text-[16px] leading-7 text-muted">
+            Each agent has its own profile: a spending limit, an approval rule, its own purchase
+            history, and an off switch. Limits live in the vault, so the agent cannot raise its
+            cap or skip approval. One budget across every x402 seller.
           </p>
         </div>
 
         <section className="grid gap-px overflow-hidden rounded-2xl border border-rule bg-rule sm:grid-cols-2 lg:grid-cols-4">
-          <Stat label="Vault balance" value={formatUsd(state.vaultCents)} hint="Play USDC. Owner-funded." />
-          <Stat label="Agents" value={String(state.agents.length)} hint="Each has its own caps." />
+          <Stat label="Vault balance" value={formatUsd(state.vaultCents)} hint="Play USDC. Owner-funded. Never custodied by Spendlock." />
+          <Stat label="Profiles" value={String(state.agents.filter((a) => a.active).length)} hint="One card per agent." />
           <Stat
             label="Pending approvals"
             value={String(pending.length)}
-            hint="Above-threshold spends wait here."
+            hint="Above the approval rule, or every purchase."
             warn={pending.length > 0}
           />
           <Stat
@@ -101,7 +112,13 @@ export function DemoDashboard() {
 
         <PendingApprovals pending={pending} app={app} />
 
-        <AgentsTable app={app} />
+        <AgentProfileCards app={app} />
+
+        <ThreeSellerRun
+          app={app}
+          results={sellerRun}
+          onRun={() => setSellerRun(app.runSellers("scout"))}
+        />
 
         <TrySpend app={app} last={last} setLast={setLast} />
 
@@ -144,7 +161,7 @@ function KillSwitch({ killed, onToggle }: { killed: boolean; onToggle: () => voi
         <div>
           <h2 className="font-serif text-3xl">Kill switch</h2>
           <p className="mt-1 max-w-xl text-[16px] leading-7 text-muted">
-            Freeze every agent this instant. Owner can still withdraw. Turn it back off when you
+            Freeze every profile this instant. Owner can still withdraw. Turn it back off when you
             mean it.
           </p>
         </div>
@@ -175,13 +192,13 @@ function PendingApprovals({
       <div className="border-b border-rule px-6 py-5">
         <h2 className="font-serif text-2xl">Pending approvals</h2>
         <p className="mt-1 text-sm text-muted">
-          Spends above an agent&apos;s threshold wait here. Approving re-checks every rule (caps,
-          allowlist, kill switch).
+          Payments above an agent&apos;s approval rule wait here. Approving re-checks every rule
+          (caps, allowlist, kill switch).
         </p>
       </div>
       {pending.length === 0 ? (
         <p className="px-6 py-5 text-sm text-muted">
-          None. Try &ldquo;Ask owner: $8 data feed&rdquo; below.
+          None. Try Ops buying company data — every purchase needs you.
         </p>
       ) : (
         <div className="overflow-x-auto">
@@ -235,131 +252,243 @@ function PendingApprovals({
   );
 }
 
-function AgentsTable({ app }: { app: ReturnType<typeof useSpendlock> }) {
+function AgentProfileCards({ app }: { app: ReturnType<typeof useSpendlock> }) {
   const state = app.state!;
   return (
-    <section className="rounded-2xl border border-rule bg-card">
-      <div className="border-b border-rule px-6 py-5">
-        <h2 className="font-serif text-2xl">Agents and rules</h2>
+    <section id="agent-profiles">
+      <div className="mb-4">
+        <h2 className="font-serif text-2xl">Profiles</h2>
         <p className="mt-1 text-sm text-muted">
-          Per-agent caps. Ask-owner threshold. Allowlist. Pause one agent without killing the rest.
+          One card per agent. Pause or delete a profile without touching the others. History is
+          that agent&apos;s purchases only.
         </p>
       </div>
-      <div className="overflow-x-auto">
-        <table className="min-w-full text-left text-sm">
-          <thead className="text-xs uppercase tracking-wide text-muted">
-            <tr>
-              {[
-                "Agent",
-                "Per tx",
-                "Daily (spent today)",
-                "Budget left",
-                "Ask owner above",
-                "Expires",
-                "May pay",
-                "State",
-              ].map((h) => (
-                <th key={h} className="px-6 py-3 font-medium">
-                  {h}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {state.agents.map((agent) => {
-              const left = remaining(agent, state.vaultCents, state.killed);
-              const allowed = agent.allowlist
-                .map((id) => state.recipients.find((item) => item.id === id)?.label ?? id)
-                .join(", ");
-              return (
-                <tr key={agent.id} className="border-t border-rule align-top">
-                  <td className="px-6 py-3">
-                    <p className="font-medium">{agent.name}</p>
-                    <p className="text-xs text-muted">{agent.role}</p>
-                    <p className="font-mono text-xs text-muted">{shortAddress(agent.address)}</p>
-                  </td>
-                  <td className="px-6 py-3">{formatUsd(agent.perTxCents)}</td>
-                  <td className="px-6 py-3">
-                    {formatUsd(agent.dailyLimitCents)} ({formatUsd(left.usedToday)})
-                  </td>
-                  <td className="px-6 py-3">
-                    {formatUsd(left.budget)} of {formatUsd(agent.totalBudgetCents)}
-                  </td>
-                  <td className="px-6 py-3 font-medium">
-                    {agent.approvalThresholdCents
-                      ? formatUsd(agent.approvalThresholdCents)
-                      : "never"}
-                  </td>
-                  <td className="px-6 py-3">
-                    {agent.expiry ? new Date(agent.expiry).toISOString().slice(0, 10) : "never"}
-                  </td>
-                  <td className="px-6 py-3">{allowed}</td>
-                  <td className="px-6 py-3">
-                    <p>
-                      {!agent.active
-                        ? "removed"
-                        : agent.paused
-                          ? "paused"
-                          : state.killed
-                            ? "stopped (kill switch)"
-                            : `can spend ${formatUsd(left.spendableNow)} now`}
-                    </p>
-                    {agent.active ? (
-                      <button
-                        type="button"
-                        onClick={() => app.togglePause(agent.id)}
-                        className="mt-2 rounded border border-rule px-2 py-1 text-xs hover:bg-paper"
-                      >
-                        {agent.paused ? "Resume" : "Pause"}
-                      </button>
-                    ) : null}
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+      <div className="grid gap-4 lg:grid-cols-3">
+        {state.agents.map((agent) => (
+          <ProfileCard key={agent.id} agent={agent} app={app} />
+        ))}
       </div>
     </section>
   );
 }
 
+function ProfileCard({
+  agent,
+  app,
+}: {
+  agent: Agent;
+  app: ReturnType<typeof useSpendlock>;
+}) {
+  const state = app.state!;
+  const left = remaining(agent, state.vaultCents, state.killed);
+  const history = historyFor(state, agent.id).slice(0, 6);
+  const frozen = !agent.active || agent.paused || state.killed;
+  return (
+    <article
+      className={`flex flex-col rounded-2xl border bg-card p-5 ${
+        !agent.active ? "border-rule opacity-70" : frozen ? "border-brick/40" : "border-rule"
+      }`}
+    >
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <h3 className="font-serif text-2xl text-ink">{agent.name}</h3>
+          <p className="mt-1 text-sm text-muted">{agent.role}</p>
+          <p className="mt-1 font-mono text-xs text-muted">{shortAddress(agent.address)}</p>
+        </div>
+        <span
+          className={`rounded-full px-2.5 py-1 text-xs font-medium ${
+            !agent.active
+              ? "bg-paper-2 text-muted"
+              : agent.paused
+                ? "bg-brick-soft text-brick"
+                : state.killed
+                  ? "bg-brick-soft text-brick"
+                  : "bg-ok-soft text-pine"
+          }`}
+        >
+          {!agent.active ? "Deleted" : agent.paused ? "Paused" : state.killed ? "Frozen" : "Live"}
+        </span>
+      </div>
+
+      <dl className="mt-4 grid grid-cols-2 gap-3 text-sm">
+        <div>
+          <dt className="text-muted">Limit</dt>
+          <dd className="mt-0.5 font-medium">
+            {formatUsd(agent.perTxCents)} / tx
+            <span className="block text-xs font-normal text-muted">
+              {formatUsd(agent.dailyLimitCents)} / day · {formatUsd(agent.totalBudgetCents)} lifetime
+            </span>
+          </dd>
+        </div>
+        <div>
+          <dt className="text-muted">Approval rule</dt>
+          <dd className="mt-0.5 font-medium">{approvalRuleLabel(agent.approvalRule)}</dd>
+        </div>
+        <div>
+          <dt className="text-muted">Spend this day</dt>
+          <dd className="mt-0.5 font-medium">
+            {formatUsd(left.usedToday)} of {formatUsd(agent.dailyLimitCents)}
+          </dd>
+        </div>
+        <div>
+          <dt className="text-muted">Budget left</dt>
+          <dd className="mt-0.5 font-medium">{formatUsd(left.budget)}</dd>
+        </div>
+      </dl>
+
+      <div className="mt-4 flex-1">
+        <p className="text-xs font-medium uppercase tracking-wide text-muted">Purchase history</p>
+        {history.length === 0 ? (
+          <p className="mt-2 text-sm text-muted">No purchases yet.</p>
+        ) : (
+          <ul className="mt-2 space-y-1.5 text-sm">
+            {history.map((event) => (
+              <li key={event.id} className="flex justify-between gap-2">
+                <span>
+                  <span className="font-medium">{eventLabel(event)}</span>
+                  <span className="text-muted"> · {event.toLabel}</span>
+                </span>
+                <span className="whitespace-nowrap">
+                  {event.amountCents == null ? "" : formatUsd(event.amountCents)}
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
+      {agent.active ? (
+        <div className="mt-4 flex gap-2">
+          <button
+            type="button"
+            onClick={() => app.togglePause(agent.id)}
+            className="rounded-lg border border-rule px-3 py-1.5 text-xs font-medium hover:bg-paper"
+          >
+            {agent.paused ? "Resume" : "Pause"}
+          </button>
+          <button
+            type="button"
+            onClick={() => app.deleteAgent(agent.id)}
+            className="rounded-lg border border-rule px-3 py-1.5 text-xs font-medium text-brick hover:bg-brick-soft"
+          >
+            Delete
+          </button>
+        </div>
+      ) : null}
+    </article>
+  );
+}
+
+function ThreeSellerRun({
+  app,
+  results,
+  onRun,
+}: {
+  app: ReturnType<typeof useSpendlock>;
+  results: SellerRunResult[] | null;
+  onRun: () => void;
+}) {
+  const sellers = app.state!.sellers;
+  return (
+    <section id="three-sellers" className="rounded-2xl border border-rule bg-card p-6 sm:p-8">
+      <h2 className="font-serif text-2xl">One agent, three sellers, one budget</h2>
+      <p className="mt-1 max-w-2xl text-sm leading-6 text-muted">
+        Scout hits three x402 sellers (HTTP 402, pay in USDC, retry with proof). The first two
+        are under the $5 per-tx cap and auto-approve under $50. The $25 dataset is blocked by
+        the cap — before any payment leaves the vault.
+      </p>
+
+      <ol className="mt-5 grid gap-3 sm:grid-cols-3">
+        {sellers.map((seller) => (
+          <li key={seller.id} className="rounded-xl border border-rule bg-paper px-4 py-3">
+            <p className="font-medium">{seller.label}</p>
+            <p className="text-sm text-muted">{formatUsd(seller.priceCents)} · x402</p>
+          </li>
+        ))}
+      </ol>
+
+      <button
+        type="button"
+        onClick={onRun}
+        className="mt-5 rounded-full bg-pine px-5 py-3 text-sm font-medium text-card hover:bg-pine-deep"
+      >
+        Run Scout against all three
+      </button>
+
+      {results ? (
+        <ol className="mt-5 space-y-2">
+          {results.map((step) => (
+            <li
+              key={step.sellerId}
+              className={`rounded-xl px-4 py-3 text-sm ${
+                step.outcome.status === "executed"
+                  ? "bg-ok-soft text-pine"
+                  : step.outcome.status === "pending"
+                    ? "bg-wait text-wait-ink"
+                    : "bg-brick-soft text-brick"
+              }`}
+            >
+              <p className="font-medium">
+                402 {step.sellerLabel}
+                {step.outcome.event.amountCents != null
+                  ? ` · ${formatUsd(step.outcome.event.amountCents)}`
+                  : ""}{" "}
+                → {outcomeWord(step.outcome)}
+              </p>
+              <p className="mt-1">
+                {step.outcome.event.reason}
+                {step.outcome.event.memo ? ` · ${step.outcome.event.memo}` : ""}
+              </p>
+            </li>
+          ))}
+        </ol>
+      ) : null}
+    </section>
+  );
+}
+
+function outcomeWord(outcome: SpendOutcome): string {
+  if (outcome.status === "executed") return "paid";
+  if (outcome.status === "pending") return `waiting for approval (#${outcome.requestId})`;
+  return "blocked";
+}
+
 const SCENARIOS = [
   {
-    id: "ok",
-    label: "Spend $4 on data feed",
-    hint: "Agent B · allowlisted · under cap",
-    agentId: "b",
-    toId: RECIPIENTS.feed.id,
-    amountCents: 400,
-    memo: "market data, 1 day",
+    id: "ops-ask",
+    label: "Ops buys company data $0.50",
+    hint: "Approve every purchase → waits for you",
+    agentId: "ops",
+    toId: SELLERS.company.id,
+    amountCents: 50,
+    memo: "x402 company snapshot",
+  },
+  {
+    id: "scout-ok",
+    label: "Scout buys price feed $0.02",
+    hint: "Auto-approve under $50 · under cap",
+    agentId: "scout",
+    toId: SELLERS.feed.id,
+    amountCents: 2,
+    memo: "x402 price tick",
   },
   {
     id: "cap",
-    label: "Over the cap: $12",
-    hint: "Agent B · $12 > $10 per-tx",
-    agentId: "b",
-    toId: RECIPIENTS.feed.id,
-    amountCents: 1_200,
-    memo: "over per-tx cap",
+    label: "Scout buys the $25 dataset",
+    hint: "Over the $5 per-tx cap → blocked",
+    agentId: "scout",
+    toId: SELLERS.dataset.id,
+    amountCents: 2_500,
+    memo: "x402 full dataset",
   },
   {
     id: "allow",
-    label: "Pay a stranger $3",
-    hint: "Agent A · not on allowlist",
-    agentId: "a",
-    toId: RECIPIENTS.stranger.id,
+    label: "Scout pays a stranger $3",
+    hint: "Not on the seller allowlist → blocked",
+    agentId: "scout",
+    toId: "stranger",
     amountCents: 300,
     memo: "tip a stranger",
-  },
-  {
-    id: "ask",
-    label: "Ask owner: $8 data feed",
-    hint: "Agent B · above $5 threshold",
-    agentId: "b",
-    toId: RECIPIENTS.feed.id,
-    amountCents: 800,
-    memo: "premium data feed",
   },
 ] as const;
 
@@ -373,10 +502,10 @@ function TrySpend({
   setLast: (outcome: SpendOutcome | null) => void;
 }) {
   const state = app.state!;
-  const [agentId, setAgentId] = useState<string>(state.agents[1]?.id ?? "b");
-  const [toId, setToId] = useState<string>(RECIPIENTS.feed.id);
-  const [amount, setAmount] = useState("4.00");
-  const [memo, setMemo] = useState("try a spend");
+  const [agentId, setAgentId] = useState<string>("ops");
+  const [toId, setToId] = useState<string>(SELLERS.company.id);
+  const [amount, setAmount] = useState("0.50");
+  const [memo, setMemo] = useState("x402 company snapshot");
 
   function submit(event: FormEvent) {
     event.preventDefault();
@@ -411,7 +540,8 @@ function TrySpend({
     <section className="rounded-2xl border border-rule bg-card p-6 sm:p-8">
       <h2 className="font-serif text-2xl">Try a spend</h2>
       <p className="mt-1 text-sm leading-6 text-muted">
-        Four rails, one click each. Then hit the kill switch above. Every action lands in the log.
+        Approval-required Ops, a cheap auto-approved buy, the $25 block, and a stranger off the
+        allowlist.
       </p>
 
       <div className="mt-5 grid gap-3 sm:grid-cols-2">
@@ -491,10 +621,10 @@ function OutcomeBanner({ outcome }: { outcome: SpendOutcome }) {
         : "bg-brick-soft text-brick";
   const label =
     outcome.status === "executed"
-      ? "Spent"
+      ? "Paid"
       : outcome.status === "pending"
         ? `Waiting for owner (request #${outcome.requestId})`
-        : "Rejected";
+        : "Blocked";
   return (
     <div className={`mt-5 rounded-xl px-4 py-3 text-sm leading-6 ${tone}`}>
       <p className="font-medium">
@@ -516,8 +646,8 @@ function SpendLog({ app }: { app: ReturnType<typeof useSpendlock> }) {
     <section className="rounded-2xl border border-rule bg-card">
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-rule px-6 py-5">
         <div>
-          <h2 className="font-serif text-2xl">Recent spends and rejections</h2>
-          <p className="mt-1 text-sm text-muted">Plain English. Who, what, how much, and why.</p>
+          <h2 className="font-serif text-2xl">Team-wide log</h2>
+          <p className="mt-1 text-sm text-muted">Every agent, every seller. Paid, blocked, waiting.</p>
         </div>
         <button
           type="button"
@@ -564,7 +694,7 @@ function SpendLog({ app }: { app: ReturnType<typeof useSpendlock> }) {
 
 function rowTone(event: LogEvent): string {
   if (event.kind === "spent" || event.kind === "approved") return "bg-ok-soft/60";
-  if (event.kind === "rejected" || event.kind === "request-rejected" || event.kind === "kill") {
+  if (event.kind === "rejected" || event.kind === "request-rejected" || event.kind === "kill" || event.kind === "deleted") {
     return "bg-brick-soft/70";
   }
   if (event.kind === "asked") return "bg-wait/80";
@@ -574,19 +704,21 @@ function rowTone(event: LogEvent): string {
 function eventLabel(event: LogEvent): string {
   switch (event.kind) {
     case "spent":
-      return "spent";
+      return "paid";
     case "rejected":
-      return "REJECTED";
+      return "blocked";
     case "asked":
-      return "asked approval";
+      return "waiting";
     case "approved":
       return "approved";
     case "request-rejected":
-      return "request rejected";
+      return "rejected";
     case "kill":
       return "kill switch";
     case "pause":
       return "pause";
+    case "deleted":
+      return "deleted";
     default:
       return event.kind;
   }

@@ -4,6 +4,14 @@ export type Recipient = {
   address: string;
 };
 
+export type Seller = Recipient & {
+  url: string;
+  priceCents: number;
+};
+
+/** Walmart-style: approve every purchase, or auto-approve under $50 / $100 / $200. */
+export type ApprovalRule = "every" | 50 | 100 | 200;
+
 export type Agent = {
   id: string;
   name: string;
@@ -12,12 +20,12 @@ export type Agent = {
   perTxCents: number;
   dailyLimitCents: number;
   totalBudgetCents: number;
-  /** Spends ABOVE this wait for the owner. 0 = never ask. */
-  approvalThresholdCents: number;
+  approvalRule: ApprovalRule;
   expiry: number | null;
   active: boolean;
   paused: boolean;
   allowlist: string[];
+  blocklist: string[];
   spentTotalCents: number;
   spentTodayCents: number;
   dayKey: string;
@@ -42,7 +50,8 @@ export type LogKind =
   | "approved"
   | "request-rejected"
   | "kill"
-  | "pause";
+  | "pause"
+  | "deleted";
 
 export type LogEvent = {
   id: string;
@@ -58,12 +67,13 @@ export type LogEvent = {
 };
 
 export type AppState = {
-  version: 2;
+  version: 3;
   vaultCents: number;
   killed: boolean;
   nextRequestId: number;
   agents: Agent[];
   recipients: Recipient[];
+  sellers: Seller[];
   requests: ApprovalRequest[];
   events: LogEvent[];
 };

@@ -14,7 +14,12 @@ echo
 echo "Browser demo (no wallet, simulated state):"
 echo "  cd web && npm install && npm run dev"
 echo "  open http://localhost:3000/spendlock/       landing"
-echo "  open http://localhost:3000/spendlock/demo/  owner dashboard"
+echo "  open http://localhost:3000/spendlock/demo/  Agent Profiles"
+echo "  open http://localhost:3000/spendlock/market/  pay-per-verified-wallet job"
+
+echo
+echo "x402 Agent Profiles demo (no chain):"
+echo "  cd agents && npm install && npm test && npm run demo"
 
 if [ -z "${KEEP:-}" ]; then
   echo
