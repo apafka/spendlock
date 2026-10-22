@@ -35,6 +35,12 @@ export default function HomePage() {
               >
                 Try Agent Profiles
               </Link>
+              <Link
+                href="/market"
+                className="rounded-full border border-rule px-5 py-3 text-sm font-medium text-ink hover:bg-paper-2"
+              >
+                Watch a wallet job
+              </Link>
               <a
                 href="#pricing"
                 className="rounded-full border border-rule px-5 py-3 text-sm font-medium text-ink hover:bg-paper-2"
@@ -132,6 +138,26 @@ export default function HomePage() {
               </p>
             </li>
           </ol>
+        </section>
+
+        <section id="market" className="mt-20 rounded-2xl border border-rule bg-card px-6 py-10 sm:px-10">
+          <p className="text-sm font-medium uppercase tracking-[0.16em] text-muted">The job</p>
+          <h2 className="mt-2 font-serif text-3xl text-ink sm:text-4xl">
+            One product: pay per verified Hyperliquid wallet.
+          </h2>
+          <p className="mt-5 max-w-3xl text-[16px] leading-7 text-ink">
+            An agent posts a job with a budget. A worker delivers candidate wallets. Software re-checks
+            each one against Hyperliquid&apos;s public info API. ResultEscrow pays only the wallets
+            that pass, takes a 2% fee, and refunds the rest to the Spendlock vault.
+            $3 per verified wallet. $100 job cap. The vault&apos;s per-agent cap stops a job that is too
+            big. No wallet required to watch it.
+          </p>
+          <Link
+            href="/market"
+            className="mt-8 inline-flex rounded-full bg-pine px-5 py-3 text-sm font-medium text-card hover:bg-pine-deep"
+          >
+            Open the market demo
+          </Link>
         </section>
 
         <section id="pricing" className="mt-20">

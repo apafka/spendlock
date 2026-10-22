@@ -2,12 +2,13 @@
   "name": "spendlock-web",
   "version": "0.2.0",
   "private": true,
-  "description": "Spendlock founder landing page and no-wallet demo.",
+  "description": "Spendlock founder landing, no-wallet owner dashboard, and no-wallet market demo.",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test": "tsx --test lib/market-engine.test.ts lib/wallet-rules.test.ts"
   },
   "dependencies": {
     "next": "16.3.8",
@@ -22,6 +23,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.3.8",
     "tailwindcss": "^4",
+    "tsx": "^4.20.6",
     "typescript": "^5"
   }
 }
