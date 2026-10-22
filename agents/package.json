@@ -6,7 +6,10 @@
   "description": "Spendlock MCP tools and owner CLI. Testnet / local only.",
   "scripts": {
     "mcp": "node spendlock-mcp.js",
-    "owner": "node spendlock-owner.js"
+    "owner": "node spendlock-owner.js",
+    "demo": "node demo-x402.js",
+    "sellers": "node mock-sellers.js",
+    "test": "node --test pay.test.js"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.18.2",

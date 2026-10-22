@@ -1,5 +1,6 @@
 import type {
   Agent,
+  ApprovalRule,
   AppState,
   LogEvent,
   SpendAttempt,
@@ -35,6 +36,20 @@ export function remaining(agent: Agent, vaultCents: number, killed: boolean, at 
   return { perTx: agent.perTxCents, today, budget, spendableNow, usedToday };
 }
 
+export function approvalRuleLabel(rule: ApprovalRule): string {
+  if (rule === "every") return "Approve every purchase";
+  return `Auto-approve under $${rule}`;
+}
+
+export function needsOwnerApproval(agent: Agent, amountCents: number): boolean {
+  if (agent.approvalRule === "every") return true;
+  return amountCents > agent.approvalRule * 100;
+}
+
+export function historyFor(state: AppState, agentId: string): LogEvent[] {
+  return state.events.filter((event) => event.agentId === agentId);
+}
+
 export function recipientOf(state: AppState, toId: string) {
   return state.recipients.find((item) => item.id === toId);
 }
@@ -56,7 +71,14 @@ export function checkSpend(
   if (agent.paused) return "agent paused";
   if (agent.expiry != null && Date.parse(at) > agent.expiry) return "policy expired";
   if (!Number.isFinite(attempt.amountCents) || attempt.amountCents <= 0) return "zero amount";
-  if (!to || !agent.allowlist.includes(to.id)) return "recipient not allowed";
+  const blocked = agent.blocklist ?? [];
+  if (blocked.includes(attempt.toId) || (to && blocked.includes(to.id))) {
+    return "seller blocked";
+  }
+  const allowed = agent.allowlist ?? [];
+  if (!to || (allowed.length > 0 && !allowed.includes(to.id))) {
+    return "seller not allowed";
+  }
   if (attempt.amountCents > agent.perTxCents) return "over per-tx cap";
   const usedToday = freshSpentToday(agent, at);
   if (usedToday + attempt.amountCents > agent.dailyLimitCents) return "over daily limit";
@@ -126,7 +148,7 @@ export function applySpend(state: AppState, attempt: SpendAttempt): { state: App
     throw new Error("invariant: check passed without agent/recipient");
   }
 
-  if (agent.approvalThresholdCents !== 0 && attempt.amountCents > agent.approvalThresholdCents) {
+  if (needsOwnerApproval(agent, attempt.amountCents)) {
     const requestId = state.nextRequestId;
     const event = logEvent({
       at,
@@ -136,7 +158,10 @@ export function applySpend(state: AppState, attempt: SpendAttempt): { state: App
       amountCents: attempt.amountCents,
       toId: to.id,
       toLabel,
-      reason: `asks owner above ${formatUsd(agent.approvalThresholdCents)}`,
+      reason:
+        agent.approvalRule === "every"
+          ? "approval required for every purchase"
+          : `asks owner above ${formatUsd(agent.approvalRule * 100)}`,
       memo: attempt.memo,
     });
     return {
@@ -283,7 +308,7 @@ export function setKill(state: AppState, on: boolean): AppState {
 
 export function setAgentPaused(state: AppState, agentId: string, paused: boolean): AppState {
   const agent = agentOf(state, agentId);
-  if (!agent || agent.paused === paused) return state;
+  if (!agent || !agent.active || agent.paused === paused) return state;
   const event = logEvent({
     at: new Date().toISOString(),
     agentId: agent.id,
@@ -299,6 +324,45 @@ export function setAgentPaused(state: AppState, agentId: string, paused: boolean
     ...replaceAgent(state, { ...agent, paused }),
     events: [event, ...state.events],
   };
+}
+
+export function removeAgent(state: AppState, agentId: string): AppState {
+  const agent = agentOf(state, agentId);
+  if (!agent || !agent.active) return state;
+  const event = logEvent({
+    at: new Date().toISOString(),
+    agentId: agent.id,
+    agentName: agent.name,
+    kind: "deleted",
+    amountCents: null,
+    toId: null,
+    toLabel: agent.name,
+    reason: "agent deleted",
+    memo: "",
+  });
+  return {
+    ...replaceAgent(state, { ...agent, active: false, paused: true }),
+    events: [event, ...state.events],
+  };
+}
+
+export function runThreeSellerDemo(
+  state: AppState,
+  agentId = "scout",
+): { state: AppState; results: { sellerId: string; sellerLabel: string; outcome: SpendOutcome }[] } {
+  let current = state;
+  const results: { sellerId: string; sellerLabel: string; outcome: SpendOutcome }[] = [];
+  for (const seller of state.sellers) {
+    const { state: next, outcome } = applySpend(current, {
+      agentId,
+      toId: seller.id,
+      amountCents: seller.priceCents,
+      memo: `x402 ${seller.label}`,
+    });
+    current = next;
+    results.push({ sellerId: seller.id, sellerLabel: seller.label, outcome });
+  }
+  return { state: current, results };
 }
 
 export function eventsToCsv(events: LogEvent[]): string {

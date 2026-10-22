@@ -6,6 +6,8 @@ import {
   approveRequest,
   eventsToCsv,
   rejectRequest,
+  removeAgent,
+  runThreeSellerDemo,
   setAgentPaused,
   setKill,
 } from "./engine";
@@ -21,54 +23,50 @@ import type { SpendAttempt, SpendOutcome } from "./types";
 export function useSpendlock() {
   const state = useSyncExternalStore(subscribe, getClientSnapshot, getServerSnapshot);
 
-  const trySpend = useCallback(
-    (attempt: SpendAttempt): SpendOutcome | null => {
-      if (!state) return null;
-      const { state: next, outcome } = applySpend(state, attempt);
-      saveState(next);
-      return outcome;
-    },
-    [state],
-  );
+  const trySpend = useCallback((attempt: SpendAttempt): SpendOutcome | null => {
+    const current = getClientSnapshot();
+    const { state: next, outcome } = applySpend(current, attempt);
+    saveState(next);
+    return outcome;
+  }, []);
 
-  const approve = useCallback(
-    (id: number) => {
-      if (!state) return;
-      saveState(approveRequest(state, id));
-    },
-    [state],
-  );
+  const approve = useCallback((id: number) => {
+    saveState(approveRequest(getClientSnapshot(), id));
+  }, []);
 
-  const reject = useCallback(
-    (id: number) => {
-      if (!state) return;
-      saveState(rejectRequest(state, id, "rejected by owner"));
-    },
-    [state],
-  );
+  const reject = useCallback((id: number) => {
+    saveState(rejectRequest(getClientSnapshot(), id, "rejected by owner"));
+  }, []);
 
   const toggleKill = useCallback(() => {
-    if (!state) return;
-    saveState(setKill(state, !state.killed));
-  }, [state]);
+    const current = getClientSnapshot();
+    saveState(setKill(current, !current.killed));
+  }, []);
 
-  const togglePause = useCallback(
-    (agentId: string) => {
-      if (!state) return;
-      const agent = state.agents.find((item) => item.id === agentId);
-      if (!agent) return;
-      saveState(setAgentPaused(state, agentId, !agent.paused));
-    },
-    [state],
-  );
+  const togglePause = useCallback((agentId: string) => {
+    const current = getClientSnapshot();
+    const agent = current.agents.find((item) => item.id === agentId);
+    if (!agent) return;
+    saveState(setAgentPaused(current, agentId, !agent.paused));
+  }, []);
+
+  const deleteAgent = useCallback((agentId: string) => {
+    saveState(removeAgent(getClientSnapshot(), agentId));
+  }, []);
+
+  const runSellers = useCallback((agentId = "scout") => {
+    const { state: next, results } = runThreeSellerDemo(getClientSnapshot(), agentId);
+    saveState(next);
+    return results;
+  }, []);
 
   const reset = useCallback(() => {
     resetState();
   }, []);
 
   const downloadCsv = useCallback(() => {
-    if (!state) return;
-    const blob = new Blob([eventsToCsv(state.events)], { type: "text/csv;charset=utf-8" });
+    const current = getClientSnapshot();
+    const blob = new Blob([eventsToCsv(current.events)], { type: "text/csv;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
@@ -77,7 +75,18 @@ export function useSpendlock() {
     link.click();
     link.remove();
     URL.revokeObjectURL(url);
-  }, [state]);
+  }, []);
 
-  return { state, trySpend, approve, reject, toggleKill, togglePause, reset, downloadCsv };
+  return {
+    state,
+    trySpend,
+    approve,
+    reject,
+    toggleKill,
+    togglePause,
+    deleteAgent,
+    runSellers,
+    reset,
+    downloadCsv,
+  };
 }

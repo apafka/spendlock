@@ -14,6 +14,10 @@ import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol
 ///           - expiry                     - pause switch
 ///           - approval threshold: spends above it wait for the owner (approve / reject)
 ///         Plus one global kill switch that stops every agent at once.
+///         Agent Profiles (name, Walmart-style approval rule, per-agent history, pause/delete)
+///         sit on top of these per-agent limits in the dashboard/MCP. This contract is the
+///         custody: the agent cannot raise its cap, skip approval, or unpause itself.
+///         Spendlock never holds customer money — funds stay in this vault.
 /// @dev    Policy failures do NOT revert: they emit SpendRejected and return Result.Rejected, so the
 ///         rejection itself is stored onchain (an audit trail). Only callers that are not agents revert.
 ///         Refunds from contracts like ResultEscrow come straight back here, because this vault is the

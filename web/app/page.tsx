@@ -12,29 +12,28 @@ export default function HomePage() {
         <section className="grid gap-12 pb-16 pt-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-end lg:pb-20 lg:pt-14">
           <div>
             <p className="mb-4 text-sm font-medium uppercase tracking-[0.16em] text-muted">
-              For small founder agent teams
+              Agent Profiles for every seller, not one store
             </p>
             <h1 className="max-w-4xl font-serif text-4xl leading-[1.08] tracking-tight text-ink sm:text-5xl lg:text-6xl">
-              Basecamp-simple spend rails for your small agent team: one dashboard, hard caps,
-              allowlist, kill switch, readable log.
+              Spend limits your agent can&apos;t turn off
             </h1>
           </div>
           <div className="max-w-md space-y-6">
             <p className="text-lg leading-8 text-ink">
-              Broad agent-payment platforms want to be the bank, the identity layer, and the
-              marketplace. Spendlock is the opposite: a vault of USDC on Base, with rules the
-              contract actually enforces.
+              Limits live in the vault, outside the agent, so a misbehaving agent cannot raise
+              its cap or skip approval. One budget across every seller — not one per platform.
             </p>
             <p className="text-lg leading-8 text-ink">
-              Per-agent caps. Daily limit. Recipient allowlist. Owner approval above a threshold.
-              One kill switch. A log you can read.
+              Walmart, Stripe, Circle each enforce limits only inside their own rails. Spendlock
+              is the cross-platform version: one budget, one rule set, one log for all of a
+              team&apos;s agents, wherever they pay. Starting with x402 sellers.
             </p>
             <div className="flex flex-wrap gap-3">
               <Link
                 href="/demo"
                 className="rounded-full bg-pine px-5 py-3 text-sm font-medium text-card hover:bg-pine-deep"
               >
-                Try the interactive demo
+                Try Agent Profiles
               </Link>
               <a
                 href="#pricing"
@@ -45,6 +44,7 @@ export default function HomePage() {
             </div>
             <p className="text-sm text-muted">
               No wallet. No keys. Simulated play money in the browser. Testnet only — never mainnet.
+              Non-custodial: funds stay in your vault.
             </p>
           </div>
         </section>
@@ -52,24 +52,24 @@ export default function HomePage() {
         <section className="grid gap-px overflow-hidden rounded-2xl border border-rule bg-rule sm:grid-cols-2 lg:grid-cols-5">
           {[
             {
-              title: "Hard caps",
-              body: "Per-agent per-tx, daily, and lifetime budget. Over the line, the money does not move.",
+              title: "Agent Profiles",
+              body: "Each agent gets a name, a budget, an approval rule, its own purchase history, and an off switch.",
             },
             {
-              title: "Allowlist",
-              body: "Agents may pay only the addresses you listed. A stranger is a no, with a reason.",
+              title: "Hard caps",
+              body: "Per-tx, daily, and lifetime live in the vault. The agent cannot raise them.",
             },
             {
               title: "Ask the owner",
-              body: "Spends above a threshold wait. You approve or reject. The contract re-checks the rules.",
+              body: "Approve every purchase, or auto-approve under $50, $100, or $200. Above that waits.",
+            },
+            {
+              title: "One log",
+              body: "Paid, blocked, waiting — every seller, every agent, in plain English.",
             },
             {
               title: "Kill switch",
               body: "One switch freezes every agent. Owner can still pull funds out.",
-            },
-            {
-              title: "Readable log",
-              body: "Spent, rejected, waiting — in plain English. Not a block explorer dump.",
             },
           ].map((item) => (
             <article key={item.title} className="bg-card p-6">
@@ -83,24 +83,25 @@ export default function HomePage() {
           <div>
             <p className="text-sm font-medium uppercase tracking-[0.16em] text-muted">Why now</p>
             <h2 className="mt-2 font-serif text-3xl text-ink sm:text-4xl">
-              Agents are already spending. The rails are still hope.
+              Stores are adding agent profiles. Your agents shop everywhere else too.
             </h2>
           </div>
           <div className="space-y-5 text-[16px] leading-7 text-ink">
             <p>
-              Recent reports suggest an AI research agent spent someone else&apos;s test funds
-              without permission. Other reports suggest banks are starting to restrict how agents
-              can reach customer accounts.
+              Walmart just announced Agent Profiles: each agent gets its own profile with a
+              spending limit, approval by default, a separate purchase history, and an off switch
+              — inside Walmart. That is the right model. It is still one store.
             </p>
             <p>
-              If your Cursor agents already buy data, compute, or other agents&apos; work, a prompt
-              is not a spending policy. Off-chain limits in the agent&apos;s own code can be
-              skipped. Spendlock puts the rules onchain, on Base, in USDC — testnet for now, no
-              token, no mainnet.
+              If your Cursor agents already buy data, compute, or other agents&apos; work over
+              x402, a prompt is not a spending policy. Off-chain limits in the agent&apos;s own
+              code can be skipped. Spendlock puts the rules in a vault the agent does not
+              control: USDC on Base, testnet for now, no token, no mainnet, no custody of
+              customer money.
             </p>
             <p className="text-muted">
-              We are not claiming those incidents as confirmed legal findings. They are the weather.
-              Founders who let agents spend need hard rails they can install this week.
+              Start with x402 sellers (HTTP 402, pay in USDC, retry with proof). One budget
+              follows the agent across every seller that speaks 402.
             </p>
           </div>
         </section>
@@ -111,21 +112,23 @@ export default function HomePage() {
             <li className="rounded-2xl border border-rule bg-card p-6">
               <p className="text-sm font-medium text-muted">1. Fund a vault</p>
               <p className="mt-3 text-[16px] leading-7">
-                You deposit USDC. Each agent gets a policy: caps, allowlist, expiry, and when to
-                ask you.
+                You deposit USDC. Each agent gets a profile: caps, approval rule, seller
+                allowlist, pause/delete. Spendlock never holds the money.
               </p>
             </li>
             <li className="rounded-2xl border border-rule bg-card p-6">
-              <p className="text-sm font-medium text-muted">2. Agents spend inside the rails</p>
+              <p className="text-sm font-medium text-muted">2. Agents pay inside the rails</p>
               <p className="mt-3 text-[16px] leading-7">
-                Via MCP tools from Cursor, or a direct contract call. Over cap, off-list, or kill
-                switch on → rejected and logged. Above threshold → waits.
+                <code className="text-sm">spendlock_pay</code> hits an x402 seller. On 402, the
+                profile is checked <em>before</em> paying. Over cap, blocked seller, or kill
+                switch → rejected and logged. Above the approval rule → waits.
               </p>
             </li>
             <li className="rounded-2xl border border-rule bg-card p-6">
               <p className="text-sm font-medium text-muted">3. You watch one dashboard</p>
               <p className="mt-3 text-[16px] leading-7">
-                Approve the big ones. Pause one agent. Or hit the kill switch. Export the log.
+                One card per agent. Approve the big ones. Pause or delete a profile. Or hit the
+                kill switch. Export the team log.
               </p>
             </li>
           </ol>
@@ -134,9 +137,22 @@ export default function HomePage() {
         <section id="pricing" className="mt-20">
           <p className="text-sm font-medium uppercase tracking-[0.16em] text-muted">Pricing</p>
           <h2 className="mt-2 font-serif text-3xl text-ink sm:text-4xl">
-            A monthly team plan. A setup install if you want it done for you.
+            Free to try. A monthly team plan when you have more than one agent.
           </h2>
-          <div className="mt-10 grid gap-6 lg:grid-cols-2">
+          <div className="mt-10 grid gap-6 lg:grid-cols-3">
+            <article className="rounded-2xl border border-rule bg-card p-8">
+              <p className="text-sm font-medium uppercase tracking-[0.14em] text-muted">
+                Free
+              </p>
+              <p className="mt-3 font-serif text-4xl text-ink">EUR 0</p>
+              <p className="mt-2 text-sm text-muted">One agent, a small cap, the demo rails.</p>
+              <ul className="mt-6 space-y-2 text-[16px] leading-7">
+                <li>1 agent profile</li>
+                <li>Per-tx / daily / lifetime caps</li>
+                <li>Readable log, pause switch</li>
+                <li>Simulated or local anvil only</li>
+              </ul>
+            </article>
             <article className="rounded-2xl border border-rule bg-card p-8">
               <p className="text-sm font-medium uppercase tracking-[0.14em] text-muted">
                 Team plan
@@ -144,9 +160,9 @@ export default function HomePage() {
               <p className="mt-3 font-serif text-4xl text-ink">EUR 29–99 / month</p>
               <p className="mt-2 text-sm text-muted">Placeholder. We&apos;ll lock a number with the first teams.</p>
               <ul className="mt-6 space-y-2 text-[16px] leading-7">
-                <li>One vault, one dashboard, your agents.</li>
-                <li>Hard caps, allowlist, approval threshold, kill switch.</li>
-                <li>MCP tools so Cursor cloud agents can call the vault.</li>
+                <li>One vault, every agent, every seller.</li>
+                <li>Approval rules, allowlist, kill switch.</li>
+                <li>MCP tools so Cursor cloud agents can call pay.</li>
                 <li>Bootstrapped. No token. No protocol fee.</li>
               </ul>
             </article>
@@ -154,14 +170,14 @@ export default function HomePage() {
               <p className="text-sm font-medium uppercase tracking-[0.14em] text-card/70">
                 Done-for-you setup
               </p>
-              <p className="mt-3 font-serif text-4xl">from EUR 500</p>
+              <p className="mt-3 font-serif text-4xl">EUR 500</p>
               <p className="mt-2 text-sm text-card/75">
-                For founders whose agents already spend money and who want the rails installed,
-                not explained.
+                Optional. For founders whose agents already spend and who want the rails
+                installed, not explained.
               </p>
               <p className="mt-6 text-[16px] leading-7 text-card/90">
-                We stand up the vault on Base Sepolia (or local), set per-agent policies, wire the
-                MCP tools into Cursor, and walk the owner dashboard with you.
+                We stand up the vault on Base Sepolia (or local), set per-agent profiles, wire
+                the MCP tools into Cursor, and walk the owner dashboard with you.
               </p>
               <a
                 href={`mailto:${CONTACT}?subject=Spendlock%20setup%20install`}
@@ -180,26 +196,26 @@ export default function HomePage() {
           <h2 className="font-serif text-3xl text-ink">Not this</h2>
           <div className="mt-6 grid gap-6 sm:grid-cols-2 text-[16px] leading-7 text-muted">
             <p>
-              Not an AIsa-style agent-payment platform. Not a bank. Not a token. Not a waitlist
-              that hides the product. Cards and mainnet come later, if ever, and never from this
-              repo as it stands.
+              Not a bank. Not a token. Not custody of customer money. Not a waitlist that hides
+              the product. Cards and mainnet come later, if ever, and never from this repo as it
+              stands.
             </p>
             <p>
-              Settlement rail is USDC on Base. Today that means testnet and a simulated browser
-              demo. The contract is unaudited. Never put real money in it.
+              Settlement rail is USDC on Base. Today that means testnet, local anvil, and a
+              simulated browser demo. The contract is unaudited. Never put real money in it.
             </p>
           </div>
           <Link
             href="/demo"
             className="mt-8 inline-flex rounded-full bg-pine px-5 py-3 text-sm font-medium text-card hover:bg-pine-deep"
           >
-            Open the demo
+            Open the Agent Profiles demo
           </Link>
         </section>
       </main>
 
       <footer className="mx-auto w-full max-w-6xl px-5 py-8 text-sm text-muted sm:px-8">
-        Spendlock · USDC on Base (testnet) · No token · No mainnet · Unaudited
+        Spendlock · USDC on Base (testnet) · No token · No mainnet · Unaudited · {CONTACT}
       </footer>
     </div>
   );

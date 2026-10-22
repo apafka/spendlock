@@ -4,11 +4,12 @@
 
 ## What it is
 
-Spendlock is a **vault for USDC** with **rules for each AI agent** written into a smart contract.
+Spendlock is a **vault for USDC** with **Agent Profiles** for each AI agent. Limits live in the vault, outside the agent, so a misbehaving agent cannot raise its cap or skip approval.
 
-- The **owner** (you, or your company) puts USDC into the vault.
-- The owner gives each **agent** a policy: how much per payment, how much per day, how much in total, who it may pay, until when, and when to ask the owner.
-- The agent can then pay for things by itself, but **only inside those rules**. If a rule says no, the money does not move, and the "no" is recorded.
+- The **owner** (you, or your company) puts USDC into the vault. Spendlock never holds that money.
+- Each agent gets a **profile**: a name, a budget (per-tx, daily, lifetime), an approval rule (approve every purchase, or auto-approve under $50 / $100 / $200), its own purchase history, and a pause/delete switch.
+- One budget, one rule set, one log — across every seller the team pays, starting with x402 (HTTP 402 Payment Required, pay in USDC, retry with proof). Not one limit per platform.
+- The agent can then pay by itself, but **only inside those rules**. If a rule says no, the money does not move, and the "no" is recorded.
 
 Think of it as a company card for a bot, except the limits live in code that the bot cannot quietly bypass.
 
@@ -26,7 +27,7 @@ Each agent has a policy. Every spend is checked in this order; the first rule th
 | Daily limit | Max per calendar day (UTC). Resets at 00:00 UTC |
 | Total budget | Max over the agent's whole life |
 | Vault balance | The vault must hold enough |
-| Approval threshold | Payments **above** this wait for the owner to approve or reject |
+| Approval rule | Walmart-style: approve **every** purchase, or auto-approve under $50 / $100 / $200. Mapped onto the vault's approval threshold (spends **above** it wait; "every" is 1 micro-USDC so all real payments wait) |
 
 Details worth knowing:
 
@@ -45,10 +46,12 @@ Details worth knowing:
 | `contracts/test/Spendlock.t.sol` | Unit + fuzz tests for every rule |
 | `contracts/test/Spendlock.invariant.t.sol` | Random sequences of spends, escrow, approvals, pauses, kill switch |
 | `contracts/src/ResultEscrow.sol` | Optional pay-per-verified-result escrow the vault can fund |
-| `agents/spendlock-mcp.js` | MCP server: `spendlock_status`, `spendlock_spend` |
-| `agents/spendlock-owner.js` | Owner CLI: fund/policy/allow/pause/kill/approve/reject |
+| `agents/spendlock-mcp.js` | MCP server: `spendlock_status`, `spendlock_spend`, `spendlock_pay` |
+| `agents/pay.js` | `spendlockPay({ agent, url })` — 402 → check profile → pay → retry |
+| `agents/mock-sellers.js` | Three local x402 sellers (price feed $0.02, company data $0.50, dataset $25) |
+| `agents/spendlock-owner.js` | Owner CLI: profiles, pause/delete, kill, approval queue |
 | `web/app/page.tsx` | Founder landing |
-| `web/app/demo/page.tsx` | Interactive demo (simulated, no wallet) |
+| `web/app/demo/page.tsx` | Agent Profiles demo (simulated, no wallet) |
 
 ## Limits of this MVP
 

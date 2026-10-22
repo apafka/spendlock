@@ -20,9 +20,9 @@ const newsreader = Newsreader({
 });
 
 export const metadata: Metadata = {
-  title: "Spendlock — Basecamp-simple spend rails for agent teams",
+  title: "Spendlock — Spend limits your agent can't turn off",
   description:
-    "Hard caps, allowlist, owner approval, kill switch, and a readable spend log for small founder agent teams. USDC on Base testnet. No token.",
+    "Agent Profiles for every seller: a spending limit, approval by default, separate purchase history, and an off switch. Limits live in the vault, outside the agent. One budget across x402, not one per platform. USDC on Base testnet. No token.",
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {

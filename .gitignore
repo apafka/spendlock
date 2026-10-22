@@ -36,6 +36,9 @@ agents/.env
 market/agents/data/jobs/
 market/deployments/
 
+# spendlock simulated team store (profiles, log, approval queue)
+agents/data/
+
 
 # misc
 .DS_Store

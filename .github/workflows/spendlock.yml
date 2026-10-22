@@ -1,0 +1,55 @@
+name: Spendlock tests
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+    paths:
+      - "agents/**"
+      - "contracts/**"
+      - "web/**"
+      - ".github/workflows/spendlock.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  agents:
+    name: agents npm test
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: agents
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: agents/package-lock.json
+      - name: Install and test
+        run: |
+          npm ci
+          npm test
+
+  contracts:
+    name: contracts forge test
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: contracts
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+      - name: Install deps and test
+        run: |
+          forge install --no-git
+          forge test
