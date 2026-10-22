@@ -325,7 +325,7 @@ export function MarketDemo() {
           </p>
         </div>
 
-        <HonestyBanner mode={mode} reason={modeReason} />
+        <HonestyBanner mode={mode} reason={modeReason} blocked={Boolean(blocked)} />
 
         <div className="grid gap-6 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.15fr)]">
           <div className="flex flex-col gap-6">
@@ -454,7 +454,15 @@ export function MarketDemo() {
   );
 }
 
-function HonestyBanner({ mode, reason }: { mode: VerifyMode | null; reason?: string }) {
+function HonestyBanner({
+  mode,
+  reason,
+  blocked,
+}: {
+  mode: VerifyMode | null;
+  reason?: string;
+  blocked: boolean;
+}) {
   return (
     <section className="rounded-2xl border border-rule bg-card px-5 py-4 text-sm leading-6">
       <p className="font-medium text-ink">What is real on this page</p>
@@ -476,11 +484,13 @@ function HonestyBanner({ mode, reason }: { mode: VerifyMode | null; reason?: str
         </li>
         <li>
           <span className="text-ink">This run:</span>{" "}
-          {mode === "live"
-            ? "Hyperliquid checks are live."
-            : mode === "recorded"
-              ? `Recorded snapshot. ${reason ?? ""}`
-              : "Not started."}
+          {blocked
+            ? "Spendlock blocked the job before escrow. No Hyperliquid calls."
+            : mode === "live"
+              ? "Hyperliquid checks are live."
+              : mode === "recorded"
+                ? `Recorded snapshot. ${reason ?? ""}`
+                : "Not started."}
         </li>
       </ul>
     </section>
