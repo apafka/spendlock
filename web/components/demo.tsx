@@ -36,6 +36,9 @@ export function DemoDashboard() {
             <span className="font-serif text-xl tracking-tight">Spendlock</span>
           </Link>
           <div className="flex items-center gap-3 text-sm">
+            <Link href="/market" className="hidden text-muted underline-offset-4 hover:text-ink hover:underline sm:inline">
+              Market demo
+            </Link>
             <span
               className={`rounded-full px-3 py-1 font-medium ${
                 state.killed ? "bg-brick-soft text-brick" : "bg-ok-soft text-pine"

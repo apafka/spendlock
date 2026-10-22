@@ -12,7 +12,7 @@ Broad agent-payment platforms want to be the bank, the identity layer, and the m
 
 | Path | What it is |
 |---|---|
-| `web/` | Founder landing page and a **no-wallet interactive demo** (GitHub Pages at `/spendlock/` and `/spendlock/demo/`) |
+| `web/` | Founder landing page, **no-wallet owner dashboard**, and **no-wallet market demo** (GitHub Pages at `/spendlock/`, `/spendlock/demo/`, `/spendlock/market/`) |
 | `contracts/` | `Spendlock.sol` vault + Foundry tests (and ResultEscrow, which the vault can pay) |
 | `agents/` | MCP tools (`spendlock_status`, `spendlock_spend`) and an owner CLI |
 | `SPENDLOCK.md` | Plain-English guide to the onchain rules |
@@ -31,8 +31,9 @@ The app is built with `basePath: /spendlock` so local matches GitHub Pages:
 
 - [http://localhost:3000/spendlock/](http://localhost:3000/spendlock/) — landing (headline, why now, pricing)
 - [http://localhost:3000/spendlock/demo/](http://localhost:3000/spendlock/demo/) — owner dashboard, simulated in the browser
+- [http://localhost:3000/spendlock/market/](http://localhost:3000/spendlock/market/) — pay-per-verified-wallet job, no wallet
 
-Public site (after merge to `main`): [https://apafka.github.io/spendlock/](https://apafka.github.io/spendlock/) and [https://apafka.github.io/spendlock/demo/](https://apafka.github.io/spendlock/demo/).
+Public site (after merge to `main`): [https://apafka.github.io/spendlock/](https://apafka.github.io/spendlock/), [https://apafka.github.io/spendlock/demo/](https://apafka.github.io/spendlock/demo/), and [https://apafka.github.io/spendlock/market/](https://apafka.github.io/spendlock/market/).
 
 GitHub Pages is a static export of `web/` (`.github/workflows/pages.yml`). One-time repo setting if the first Actions deploy does not enable Pages by itself: **Settings → Pages → Source = GitHub Actions**.
 
@@ -44,6 +45,12 @@ On the demo you will see three agents with per-agent caps. Try, in any order:
 4. **KILL SWITCH** — every agent frozen; the next spend is rejected
 
 Every action is a row in the plain-English log. Reset demo restores the seed. State lives in `localStorage` (`spendlock.demo.v2`).
+
+### Watch one market job (still no wallet)
+
+`/market` is the pay-per-verified-result product in the browser: $3 per verified Hyperliquid wallet, $100 escrow job cap, Agent A limited to $20 per transaction. Click **Run job** (default 4 wallets / $12) and watch posting → Spendlock cap check → escrow funded from the vault → worker candidates → each wallet checked against Hyperliquid's public info API → worker payout, 2% fee, refund for unverified items. **Try a job over the cap** posts 7 wallets / $21 so the per-tx cap rejects it and the vault does not move.
+
+Settlement is simulated play USDC (no chain, no keys). Wallet checks are live from the browser when `api.hyperliquid.xyz` answers; if it does not, the page replays a labelled recorded snapshot. Candidate addresses are a recorded leaderboard snapshot plus one empty account so a refund is visible.
 
 ## Run the contract tests
 

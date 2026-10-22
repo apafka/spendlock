@@ -8,6 +8,7 @@
     "build": "npm run build --prefix web",
     "lint": "npm run lint --prefix web",
     "test": "forge test --root contracts",
+    "test:web": "npm test --prefix web",
     "demo": "./demo-spendlock.sh"
   }
 }
