@@ -15,6 +15,9 @@ export function SiteHeader({
         <span className="font-serif text-xl tracking-tight text-ink">Spendlock</span>
       </Link>
       <nav className="flex items-center gap-4 text-sm">
+        <Link href="/market" className="hidden text-muted hover:text-ink sm:inline">
+          Market
+        </Link>
         <Link href="/#why-now" className="hidden text-muted hover:text-ink sm:inline">
           Why now
         </Link>
