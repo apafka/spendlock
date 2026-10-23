@@ -69,9 +69,17 @@ async function payFromVault(team, agent, requirement, amountUSDC, memo) {
       functionName: 'spend',
       args: [requirement.payTo, usdc(amountUSDC), memo || 'x402'],
     });
-    await publicClient.waitForTransactionReceipt({ hash });
+    const receipt = await publicClient.waitForTransactionReceipt({ hash });
+    const { decodeSpendReceipt } = await import('./lib.js');
+    const onchain = decodeSpendReceipt(receipt, abi);
+    if (onchain.outcome === 'rejected') {
+      throw new Error(onchain.reason || 'vault rejected spend');
+    }
+    if (onchain.outcome === 'pending') {
+      throw new Error('vault spend waiting for owner approval');
+    }
     team.recordSpend(agent, amountUSDC);
-    return { txHash: hash, simulated: false };
+    return { txHash: hash, simulated: false, onchain };
   }
   team.recordSpend(agent, amountUSDC);
   return { txHash: `sim-${requirement.quoteId || Date.now()}`, simulated: true };

@@ -12,13 +12,24 @@ Non-custodial: funds stay in the team's own Spendlock vault. Spendlock never hol
 - Business: **free** (1 agent, small cap), bootstrapped **team plan EUR 29–99 / month**, optional **EUR 500** done-for-you setup.
 - The contract is **unaudited**. Never put real money in it.
 
+## Try it in five minutes
+
+```bash
+git clone https://github.com/apafka/spendlock.git
+cd spendlock
+./quickstart.sh
+```
+
+That starts a local anvil, deploys a play-money vault, creates one agent profile, and prints an MCP snippet for Cursor or Claude Desktop. Copy-paste steps and expected output: [QUICKSTART.md](./QUICKSTART.md). Scripted proof (paid / blocked / waiting-for-approval): `./quickstart.sh --verify`.
+
 ## What’s in this repo
 
 | Path | What it is |
 |---|---|
+| `QUICKSTART.md` | Five-minute path for an outside developer to plug Spendlock into their own agent |
 | `web/` | Founder landing page, **no-wallet owner dashboard**, and **no-wallet market demo** (GitHub Pages at `/spendlock/`, `/spendlock/demo/`, `/spendlock/market/`) |
 | `contracts/` | `Spendlock.sol` vault + Foundry tests (and ResultEscrow, which the vault can pay) |
-| `agents/` | MCP tools (`spendlock_status`, `spendlock_spend`, `spendlock_pay`), owner CLI, mock x402 sellers, demo |
+| `agents/` | MCP tools (`spendlock_status`, `spendlock_spend`, `spendlock_pay`), owner CLI, mock x402 sellers, demo, quickstart |
 | `SPENDLOCK.md` | Plain-English guide to the onchain rules |
 | `market/` | Verified-results market (including an x402 402 endpoint) |
 

@@ -38,6 +38,7 @@ market/deployments/
 
 # spendlock simulated team store (profiles, log, approval queue)
 agents/data/
+.spendlock/
 
 
 # misc

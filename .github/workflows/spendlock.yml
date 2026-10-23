@@ -8,6 +8,8 @@ on:
       - "agents/**"
       - "contracts/**"
       - "web/**"
+      - "quickstart.sh"
+      - "QUICKSTART.md"
       - ".github/workflows/spendlock.yml"
 
 permissions:
@@ -74,3 +76,26 @@ jobs:
         run: |
           forge install --no-git
           forge test
+
+  quickstart:
+    name: quickstart e2e (anvil)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: agents/package-lock.json
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+      - name: Install deps and run quickstart
+        run: |
+          (cd contracts && forge install --no-git && forge build)
+          (cd agents && npm ci)
+          ./quickstart.sh --verify

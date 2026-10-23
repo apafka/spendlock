@@ -155,8 +155,11 @@ export function createMockSeller(catalog) {
   return {
     catalog,
     listen(port = 0) {
-      return new Promise((resolve) => {
+      return new Promise((resolve, reject) => {
+        const onError = (err) => reject(err);
+        server.once('error', onError);
         server.listen(port, '127.0.0.1', () => {
+          server.removeListener('error', onError);
           const { port: p } = server.address();
           const origin = `http://127.0.0.1:${p}`;
           resolve({
@@ -172,10 +175,15 @@ export function createMockSeller(catalog) {
   };
 }
 
-export async function startMockSellers() {
+export async function startMockSellers(ports = {}) {
   const sellers = [];
   for (const catalog of SELLER_CATALOG) {
-    sellers.push(await createMockSeller(catalog).listen(0));
+    const preferred = Number(ports[catalog.id] || 0);
+    try {
+      sellers.push(await createMockSeller(catalog).listen(preferred));
+    } catch {
+      sellers.push(await createMockSeller(catalog).listen(0));
+    }
   }
   return {
     sellers,

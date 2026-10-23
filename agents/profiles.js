@@ -7,6 +7,16 @@ import { dirname, join } from 'node:path';
 
 export const APPROVAL_PRESETS = ['every', 50, 100, 200];
 
+/** `every`, a preset ($50 / $100 / $200), or any USDC number >= 0. */
+export function normalizeApprovalRule(input) {
+  if (input === 'every' || input === 'all') return 'every';
+  const n = Number(input ?? 50);
+  if (!Number.isFinite(n) || n < 0) {
+    throw new Error('approval rule must be every or a USDC amount >= 0');
+  }
+  return n;
+}
+
 /** Map a profile approval rule onto the vault's approvalThreshold (USDC).
  *  Contract: spends ABOVE the threshold wait; 0 = never ask.
  *  "every" → 1 micro-USDC so every real payment waits on-chain.
@@ -102,10 +112,7 @@ function emptyState() {
 
 function normalizeAgent(input) {
   if (!input?.id) throw new Error('agent id required');
-  const approvalRule = input.approvalRule === 'every' ? 'every' : Number(input.approvalRule ?? 50);
-  if (approvalRule !== 'every' && ![50, 100, 200].includes(approvalRule)) {
-    throw new Error('approval rule must be every, 50, 100, or 200');
-  }
+  const approvalRule = normalizeApprovalRule(input.approvalRule);
   return {
     id: String(input.id),
     name: input.name || String(input.id),

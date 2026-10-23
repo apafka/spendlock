@@ -3,6 +3,9 @@
   "version": "0.2.0",
   "private": true,
   "description": "Hard spend rails for small founder agent teams.",
+  "bin": {
+    "spendlock": "quickstart.sh"
+  },
   "scripts": {
     "dev": "npm run dev --prefix web",
     "build": "npm run build --prefix web",
@@ -10,6 +13,8 @@
     "test": "forge test --root contracts && npm test --prefix agents",
     "test:web": "npm test --prefix web",
     "demo": "./demo-spendlock.sh",
-    "demo:x402": "npm run demo --prefix agents"
+    "demo:x402": "npm run demo --prefix agents",
+    "quickstart": "./quickstart.sh",
+    "quickstart:e2e": "./quickstart.sh --verify"
   }
 }

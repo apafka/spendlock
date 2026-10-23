@@ -7,7 +7,6 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
-import { decodeEventLog } from 'viem';
 import { z } from 'zod';
 import { defaultTeam, remainingOf, approvalRuleLabel } from './profiles.js';
 import { spendlockPay } from './pay.js';
@@ -117,7 +116,11 @@ export function createSpendlockServer() {
         args: [to, amount, memo || ''],
       });
       const receipt = await publicClient.waitForTransactionReceipt({ hash });
-      return { ...decodeOutcome(receipt, preview, lib.abi), tx: hash, to, amountUSDC, memo: memo || '' };
+      const onchain = lib.decodeSpendReceipt(receipt, lib.abi);
+      if (onchain.outcome === 'unknown' && preview) {
+        return { outcome: 'rejected', reason: preview, tx: hash, to, amountUSDC, memo: memo || '' };
+      }
+      return { ...onchain, tx: hash, to, amountUSDC, memo: memo || '' };
     }),
   );
 
@@ -134,27 +137,6 @@ export function createSpendlockServer() {
   );
 
   return server;
-}
-
-function decodeOutcome(receipt, preview, abi) {
-  for (const log of receipt.logs) {
-    try {
-      const parsed = decodeEventLog({ abi, data: log.data, topics: log.topics });
-      if (parsed.eventName === 'Spent') {
-        return { outcome: 'executed', requestId: Number(parsed.args.requestId) };
-      }
-      if (parsed.eventName === 'SpendRequested') {
-        return { outcome: 'pending', requestId: Number(parsed.args.requestId) };
-      }
-      if (parsed.eventName === 'SpendRejected') {
-        return { outcome: 'rejected', requestId: Number(parsed.args.requestId), reason: parsed.args.reason };
-      }
-    } catch {
-      // logs from other contracts
-    }
-  }
-  if (preview) return { outcome: 'rejected', reason: preview };
-  return { outcome: 'unknown' };
 }
 
 const isMain = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);

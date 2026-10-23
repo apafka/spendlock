@@ -21,6 +21,31 @@ test('vault approval mapping: every purchase vs $50/$100/$200 auto-approve', () 
   assert.equal(vaultApprovalThresholdUSDC(50), 50);
   assert.equal(vaultApprovalThresholdUSDC(100), 100);
   assert.equal(vaultApprovalThresholdUSDC(200), 200);
+  assert.equal(vaultApprovalThresholdUSDC(0.1), 0.1);
+});
+
+test('custom $0.10 approval: price feed pays, company data waits, dataset blocked', async () => {
+  const t = createTeam({ seed: false, mode: 'simulated', dataDir: mkdtempSync(join(tmpdir(), 'spendlock-')) });
+  t.upsert({
+    id: 'scout',
+    name: 'Scout',
+    perTxUSDC: 5,
+    dailyUSDC: 50,
+    budgetUSDC: 100,
+    approvalRule: 0.1,
+  });
+  const pack = await startMockSellers();
+  try {
+    const paid = await spendlockPay(t, { agent: 'scout', url: pack.byId['price-feed'].url });
+    const pending = await spendlockPay(t, { agent: 'scout', url: pack.byId['company-data'].url });
+    const blocked = await spendlockPay(t, { agent: 'scout', url: pack.byId.dataset.url });
+    assert.equal(paid.outcome, 'paid');
+    assert.equal(pending.outcome, 'pending');
+    assert.equal(blocked.outcome, 'blocked');
+    assert.equal(blocked.reason, 'over per-tx cap');
+  } finally {
+    await pack.close();
+  }
 });
 
 test('one agent, three sellers, one budget: first two paid, $25 blocked by per-tx cap', async () => {
