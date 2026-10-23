@@ -1,6 +1,6 @@
 // Shared RPC helpers for the owner CLI and MCP server.
 // Refuses mainnet chain ids. Play money / testnet only.
-import { createPublicClient, createWalletClient, http, formatUnits, parseUnits, isAddress } from 'viem';
+import { createPublicClient, createWalletClient, decodeEventLog, http, formatUnits, parseUnits, isAddress } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
 import { readFileSync, existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
@@ -12,7 +12,17 @@ loadDotEnv(join(ROOT, '.env'));
 export const MAINNET_CHAIN_IDS = new Set([1, 8453, 10, 42161, 137, 56, 43114]);
 export const abi = JSON.parse(readFileSync(join(ROOT, 'abi.json'), 'utf8'));
 
+export function networkName() {
+  return process.env.NETWORK || 'local';
+}
+
+export function rpcUrl() {
+  return process.env.SPENDLOCK_RPC || process.env.RPC_URL || defaultRpc(networkName());
+}
+
+/** @deprecated read at import time; prefer networkName() / rpcUrl() */
 export const NETWORK = process.env.NETWORK || 'local';
+/** @deprecated read at import time; prefer rpcUrl() */
 export const RPC = process.env.SPENDLOCK_RPC || process.env.RPC_URL || defaultRpc(NETWORK);
 
 function defaultRpc(network) {
@@ -50,21 +60,44 @@ export function keyToAccount(raw) {
 }
 
 export async function clients(account) {
-  const publicClient = createPublicClient({ transport: http(RPC) });
+  const rpc = rpcUrl();
+  const network = networkName();
+  const publicClient = createPublicClient({ transport: http(rpc) });
   const chainId = await publicClient.getChainId();
   if (MAINNET_CHAIN_IDS.has(chainId)) {
     throw new Error(`Spendlock refuses mainnet chain id ${chainId}. Use local anvil or Base Sepolia.`);
   }
   const chain = {
     id: chainId,
-    name: NETWORK,
+    name: network,
     nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 },
-    rpcUrls: { default: { http: [RPC] } },
+    rpcUrls: { default: { http: [rpc] } },
   };
   const walletClient = account
-    ? createWalletClient({ account, chain, transport: http(RPC) })
+    ? createWalletClient({ account, chain, transport: http(rpc) })
     : null;
   return { publicClient, walletClient, chainId };
+}
+
+/** Decode a vault spend receipt into executed / pending / rejected. */
+export function decodeSpendReceipt(receipt, contractAbi = abi) {
+  for (const log of receipt.logs) {
+    try {
+      const parsed = decodeEventLog({ abi: contractAbi, data: log.data, topics: log.topics });
+      if (parsed.eventName === 'Spent') {
+        return { outcome: 'executed', requestId: Number(parsed.args.requestId) };
+      }
+      if (parsed.eventName === 'SpendRequested') {
+        return { outcome: 'pending', requestId: Number(parsed.args.requestId) };
+      }
+      if (parsed.eventName === 'SpendRejected') {
+        return { outcome: 'rejected', requestId: Number(parsed.args.requestId), reason: parsed.args.reason };
+      }
+    } catch {
+      // logs from other contracts
+    }
+  }
+  return { outcome: 'unknown' };
 }
 
 export function vaultAddress() {
@@ -100,8 +133,8 @@ export async function status(publicClient, agent) {
   const [perTxCap, dailyLimit, totalBudget, approvalThreshold, expiry, active, paused] = policy;
   const [perTx, today, budget, spendableNow] = remainingNow;
   return {
-    network: NETWORK,
-    rpc: RPC,
+    network: networkName(),
+    rpc: rpcUrl(),
     vault: vaultAddress(),
     owner,
     killed,

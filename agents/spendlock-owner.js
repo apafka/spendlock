@@ -2,7 +2,7 @@
 // Owner CLI for a Spendlock team: agent profiles, approval queue, pause/delete, kill switch.
 // Simulated by default (no wallet). On-chain vault commands still work when SPENDLOCK_VAULT is set.
 //   node spendlock-owner.js status
-//   node spendlock-owner.js profile <id> <name> <perTx> <daily> <budget> <every|50|100|200>
+//   node spendlock-owner.js profile <id> <name> <perTx> <daily> <budget> <every|USDC>
 //   node spendlock-owner.js allow <agent> <sellerUrlOrHost>
 //   node spendlock-owner.js block <agent> <sellerUrlOrHost>
 //   node spendlock-owner.js pause <agent> [false]
@@ -25,7 +25,7 @@ const show = (o) => console.log(JSON.stringify(o, (_k, v) => (typeof v === 'bigi
 function help() {
   console.log(`Spendlock owner CLI (testnet / local / simulated)
   node spendlock-owner.js status
-  node spendlock-owner.js profile <id> <name> <perTx> <daily> <budget> <every|50|100|200>
+  node spendlock-owner.js profile <id> <name> <perTx> <daily> <budget> <every|USDC>
   node spendlock-owner.js allow <agent> <sellerUrlOrHost> [false]
   node spendlock-owner.js block <agent> <sellerUrlOrHost> [false]
   node spendlock-owner.js pause <agent> [false]
@@ -83,7 +83,7 @@ if (cmd === 'status') {
     }
   }
 } else if (cmd === 'profile') {
-  if (!a1) throw new Error('profile <id> <name> <perTx> <daily> <budget> <every|50|100|200>');
+  if (!a1) throw new Error('profile <id> <name> <perTx> <daily> <budget> <every|USDC>');
   const approvalRule = a6 === 'every' ? 'every' : Number(a6 || 50);
   show(team.upsert({
     id: a1,
@@ -137,18 +137,24 @@ if (cmd === 'status') {
 } else if (cmd === 'queue') {
   show(team.pending());
 } else if (cmd === 'approve') {
-  if (simulated) show(await approvePay(team, a1));
-  else {
+  const queued = team.getRequest(a1);
+  if (queued && queued.status === 'pending') show(await approvePay(team, a1));
+  else if (!simulated) {
     const { lib, publicClient, walletClient } = await chain();
     if (!walletClient) throw new Error('OWNER_PRIVATE_KEY required.');
     show(await lib.write(walletClient, publicClient, 'approveRequest', [BigInt(a1)]));
+  } else {
+    throw new Error(`request ${a1} is not pending`);
   }
 } else if (cmd === 'reject') {
-  if (simulated) show(rejectPay(team, a1, a2 || 'rejected by owner'));
-  else {
+  const queued = team.getRequest(a1);
+  if (queued && queued.status === 'pending') show(rejectPay(team, a1, a2 || 'rejected by owner'));
+  else if (!simulated) {
     const { lib, publicClient, walletClient } = await chain();
     if (!walletClient) throw new Error('OWNER_PRIVATE_KEY required.');
     show(await lib.write(walletClient, publicClient, 'rejectRequest', [BigInt(a1), a2 || 'rejected by owner']));
+  } else {
+    throw new Error(`request ${a1} is not pending`);
   }
 } else if (cmd === 'policy' && !simulated) {
   const { lib, publicClient, walletClient } = await chain();

@@ -9,7 +9,9 @@
     "owner": "node spendlock-owner.js",
     "demo": "node demo-x402.js",
     "sellers": "node mock-sellers.js",
-    "test": "node --test pay.test.js"
+    "quickstart": "node quickstart.js",
+    "quickstart:e2e": "node quickstart.js --verify",
+    "test": "node --test pay.test.js quickstart.test.js"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.18.2",

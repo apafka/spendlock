@@ -50,6 +50,8 @@ Details worth knowing:
 | `agents/pay.js` | `spendlockPay({ agent, url })` — 402 → check profile → pay → retry |
 | `agents/mock-sellers.js` | Three local x402 sellers (price feed $0.02, company data $0.50, dataset $25) |
 | `agents/spendlock-owner.js` | Owner CLI: profiles, pause/delete, kill, approval queue |
+| `agents/quickstart.js` / `./quickstart.sh` | One-command local (or Base Sepolia) setup + MCP snippet |
+| `QUICKSTART.md` | Copy-paste path for an outside developer |
 | `web/app/page.tsx` | Founder landing |
 | `web/app/demo/page.tsx` | Agent Profiles demo (simulated, no wallet) |
 
