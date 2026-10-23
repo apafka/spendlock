@@ -11,7 +11,7 @@ export const SELLER_CATALOG = [
     path: '/v1/price',
     priceUSDC: 0.02,
     description: 'Live USD price tick',
-    address: '0x000000000000000000000000000000000000fEEd',
+    address: '0x000000000000000000000000000000000000feed',
     payload: () => ({ seller: 'price-feed', symbol: 'USDC', usd: 1, asOf: new Date().toISOString() }),
   },
   {
@@ -20,7 +20,7 @@ export const SELLER_CATALOG = [
     path: '/v1/company',
     priceUSDC: 0.5,
     description: 'Company profile snapshot',
-    address: '0x000000000000000000000000000000000000C0da',
+    address: '0x000000000000000000000000000000000000c0da',
     payload: () => ({ seller: 'company-data', name: 'Acme Bio', employees: 40, sector: 'tools' }),
   },
   {
@@ -29,7 +29,7 @@ export const SELLER_CATALOG = [
     path: '/v1/dataset',
     priceUSDC: 25,
     description: 'Full research dataset',
-    address: '0x000000000000000000000000000000000000da7A',
+    address: '0x000000000000000000000000000000000000da7a',
     payload: () => ({ seller: 'dataset', rows: 10_000, topic: 'onchain flow', note: 'simulated' }),
   },
 ];

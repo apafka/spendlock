@@ -10,7 +10,7 @@ import { createServer } from 'node:net';
 import { homedir } from 'node:os';
 import { dirname, delimiter, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { createPublicClient, createWalletClient, http } from 'viem';
+import { createPublicClient, createWalletClient, getAddress, http } from 'viem';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
 import { MAINNET_CHAIN_IDS, abi, keyToAccount, usdc } from './lib.js';
@@ -316,7 +316,7 @@ export async function deployAndConfigure({ rpc, ownerKey, agentAddress, root = R
       address: vault,
       abi,
       functionName: 'setAllowed',
-      args: [agentAddress, seller.address, true],
+      args: [agentAddress, getAddress(seller.address), true],
     });
   }
 
