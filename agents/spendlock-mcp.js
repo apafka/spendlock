@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Spendlock MCP server for a team of agent profiles.
-// Tools: spendlock_status, spendlock_spend, spendlock_pay
+// Tools: spendlock_status, spendlock_spend, spendlock_pay, spendlock_buy_verified
 // Caps, allowlist, approval, and the kill switch are enforced before money moves.
 // Simulated (default) or local anvil / MockUSDC. Refuses mainnet.
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
@@ -9,7 +9,7 @@ import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { z } from 'zod';
 import { defaultTeam, remainingOf, approvalRuleLabel } from './profiles.js';
-import { spendlockPay } from './pay.js';
+import { spendlockBuyVerified, spendlockPay } from './pay.js';
 
 const MODE = process.env.SPENDLOCK_MODE || (process.env.SPENDLOCK_VAULT ? 'vault' : 'simulated');
 const team = defaultTeam({ mode: MODE, seed: true });
@@ -134,6 +134,17 @@ export function createSpendlockServer() {
       body: z.union([z.string(), z.record(z.unknown())]).optional().describe('Optional JSON body for POST.'),
     },
     safe(async ({ agent, url, method, body }) => spendlockPay(team, { agent, url, method: method || 'GET', body })),
+  );
+
+  server.tool(
+    'spendlock_buy_verified',
+    'Buy one machine-verifiable result (company name + domain + page-match claim). Checks the agent profile first (caps, approval, kill switch). If allowed, runs the deterministic verifier against a local fixture (or live homepage if live=true). Payment is released only when the check passes: paid+verified, rejected+not paid, blocked by limits, or pending owner approval.',
+    {
+      agent: z.string().min(1).describe('Agent profile id or name.'),
+      url: z.string().url().describe('Verified-result seller URL (x402). Use ?delivery=bad on the demo seller for a failing check.'),
+      live: z.boolean().optional().describe('If true, resolve the domain and fetch its homepage. Default false (offline fixture).'),
+    },
+    safe(async ({ agent, url, live }) => spendlockBuyVerified(team, { agent, url, live: Boolean(live) })),
   );
 
   return server;

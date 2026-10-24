@@ -20,7 +20,7 @@ cd spendlock
 ./quickstart.sh
 ```
 
-That starts a local anvil, deploys a play-money vault, creates one agent profile, and prints an MCP snippet for Cursor or Claude Desktop. Copy-paste steps and expected output: [QUICKSTART.md](./QUICKSTART.md). Scripted proof (paid / blocked / waiting-for-approval): `./quickstart.sh --verify`.
+That starts a local anvil, deploys a play-money vault, creates one agent profile, and prints an MCP snippet for Cursor or Claude Desktop. Copy-paste steps and expected output: [QUICKSTART.md](./QUICKSTART.md). Scripted proof (paid / blocked / waiting-for-approval / verified / not-paid): `./quickstart.sh --verify`.
 
 ## What’s in this repo
 
@@ -29,7 +29,7 @@ That starts a local anvil, deploys a play-money vault, creates one agent profile
 | `QUICKSTART.md` | Five-minute path for an outside developer to plug Spendlock into their own agent |
 | `web/` | Founder landing page, **no-wallet owner dashboard**, and **no-wallet market demo** (GitHub Pages at `/spendlock/`, `/spendlock/demo/`, `/spendlock/market/`) |
 | `contracts/` | `Spendlock.sol` vault + Foundry tests (and ResultEscrow, which the vault can pay) |
-| `agents/` | MCP tools (`spendlock_status`, `spendlock_spend`, `spendlock_pay`), owner CLI, mock x402 sellers, demo, quickstart |
+| `agents/` | MCP tools (`spendlock_status`, `spendlock_spend`, `spendlock_pay`, `spendlock_buy_verified`), owner CLI, mock x402 sellers, demo, quickstart |
 | `SPENDLOCK.md` | Plain-English guide to the onchain rules |
 | `market/` | Verified-results market (including an x402 402 endpoint) |
 
@@ -124,7 +124,8 @@ cp .env.example .env   # fill test values; never commit .env
 ```
 
 - `spendlock_status` — profiles, remaining per tx / today / budget, pause, kill switch, pending requests, per-agent history
-- `spendlock_pay` — `{ agent, url, method?, body? }` → request the seller; on HTTP 402, check the profile **before** paying; then `paid`, `blocked` + reason, or `pending` (owner must approve)
+- `spendlock_pay` — `{ agent, url, method?, body? }` → request the seller; on HTTP 402, check the profile **before** paying; then `paid`, `blocked` + reason, or `pending` (owner must approve). A company-record quote is verified before USDC moves.
+- `spendlock_buy_verified` — `{ agent, url, live? }` → buy one machine-verifiable company record; `paid`+verified, `rejected`+not paid, `blocked`, or `pending`
 - `spendlock_spend` — `{ to, amountUSDC, memo }` on-chain spend (vault / local anvil)
 
 Owner side: `node agents/spendlock-owner.js status` (and `profile`, `pause`, `delete`, `kill`, `queue`, `approve`, `reject`).

@@ -182,7 +182,7 @@ test('MCP: spendlock_pay, status, and owner approval queue', { timeout: 30000 },
       env,
     }));
     const tools = (await mcp.listTools()).tools.map((t) => t.name).sort();
-    assert.deepEqual(tools, ['spendlock_pay', 'spendlock_spend', 'spendlock_status']);
+    assert.deepEqual(tools, ['spendlock_buy_verified', 'spendlock_pay', 'spendlock_spend', 'spendlock_status']);
     const call = async (name, args = {}) => JSON.parse((await mcp.callTool({ name, arguments: args })).content[0].text);
 
     const status = await call('spendlock_status');

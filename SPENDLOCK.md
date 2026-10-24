@@ -46,9 +46,10 @@ Details worth knowing:
 | `contracts/test/Spendlock.t.sol` | Unit + fuzz tests for every rule |
 | `contracts/test/Spendlock.invariant.t.sol` | Random sequences of spends, escrow, approvals, pauses, kill switch |
 | `contracts/src/ResultEscrow.sol` | Optional pay-per-verified-result escrow the vault can fund |
-| `agents/spendlock-mcp.js` | MCP server: `spendlock_status`, `spendlock_spend`, `spendlock_pay` |
-| `agents/pay.js` | `spendlockPay({ agent, url })` — 402 → check profile → pay → retry |
-| `agents/mock-sellers.js` | Three local x402 sellers (price feed $0.02, company data $0.50, dataset $25) |
+| `agents/spendlock-mcp.js` | MCP server: `spendlock_status`, `spendlock_spend`, `spendlock_pay`, `spendlock_buy_verified` |
+| `agents/pay.js` | `spendlockPay` / `spendlockBuyVerified` — 402 → check profile → verify (if quoted) → pay → retry |
+| `agents/verify-company.js` | Deterministic company-record check (offline fixture, optional live) |
+| `agents/mock-sellers.js` | Four local x402 sellers (price feed $0.02, company data $0.50, dataset $25, verified company $0.08) |
 | `agents/spendlock-owner.js` | Owner CLI: profiles, pause/delete, kill, approval queue |
 | `agents/quickstart.js` / `./quickstart.sh` | One-command local (or Base Sepolia) setup + MCP snippet |
 | `QUICKSTART.md` | Copy-paste path for an outside developer |

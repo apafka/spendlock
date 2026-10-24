@@ -11,7 +11,7 @@
     "sellers": "node mock-sellers.js",
     "quickstart": "node quickstart.js",
     "quickstart:e2e": "node quickstart.js --verify",
-    "test": "node --test pay.test.js quickstart.test.js"
+    "test": "node --test pay.test.js quickstart.test.js verified.test.js"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.18.2",

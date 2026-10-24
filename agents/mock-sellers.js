@@ -1,9 +1,30 @@
-// Three local mock x402 sellers. HTTP 402 Payment Required → pay in (play) USDC → retry with proof.
+// Local mock x402 sellers. HTTP 402 Payment Required → pay in (play) USDC → retry with proof.
+// The fourth seller is a verified company record: Spendlock pays only if the page matches.
 // Local / simulated only. No mainnet, no real funds.
 import http from 'node:http';
 import crypto from 'node:crypto';
+import { COMPANY_RECORD_TYPE } from './verify-company.js';
 
 export const X402_NETWORK = 'spendlock-sim';
+export const VERIFIED_COMPANY_CLAIM =
+  'domain serves a page whose title or content matches the company name';
+
+const FIXTURES = {
+  '/fixture/acme': `<!doctype html><html><head><title>Acme Tools</title></head><body><h1>Acme Tools</h1><p>Industrial widgets.</p></body></html>`,
+  '/fixture/wrong': `<!doctype html><html><head><title>Unrelated Inc</title></head><body><h1>Unrelated Inc</h1><p>Nothing about Acme.</p></body></html>`,
+};
+
+function companyRecordFor(url) {
+  const origin = url.origin;
+  const bad = url.searchParams.get('delivery') === 'bad';
+  return {
+    name: 'Acme Tools',
+    domain: bad ? 'wrong.example' : 'acme.example',
+    claim: VERIFIED_COMPANY_CLAIM,
+    evidenceUrl: `${origin}${bad ? '/fixture/wrong' : '/fixture/acme'}`,
+  };
+}
+
 export const SELLER_CATALOG = [
   {
     id: 'price-feed',
@@ -32,6 +53,17 @@ export const SELLER_CATALOG = [
     address: '0x000000000000000000000000000000000000da7a',
     payload: () => ({ seller: 'dataset', rows: 10_000, topic: 'onchain flow', note: 'simulated' }),
   },
+  {
+    id: 'verified-company',
+    name: 'Verified company',
+    path: '/v1/verified-company',
+    priceUSDC: 0.08,
+    description: 'Name + domain; paid only if the page matches',
+    address: '0x000000000000000000000000000000000000cec0',
+    resultType: COMPANY_RECORD_TYPE,
+    resultFor: companyRecordFor,
+    payload: (url) => ({ seller: 'verified-company', ...companyRecordFor(url) }),
+  },
 ];
 
 const b64 = (o) => Buffer.from(JSON.stringify(o)).toString('base64');
@@ -53,7 +85,7 @@ export function encodePayment({ quoteId, amountUSDC, agent, txHash, network = X4
   });
 }
 
-function paymentRequired(res, resource, catalog, quotes, error) {
+function paymentRequired(res, resource, catalog, quotes, error, extra = {}) {
   const quoteId = crypto.randomUUID();
   const quote = {
     quoteId,
@@ -81,6 +113,7 @@ function paymentRequired(res, resource, catalog, quotes, error) {
           priceUSDC: catalog.priceUSDC,
           seller: catalog.id,
           retryWith: 'X-PAYMENT: base64(JSON {x402Version:1, scheme:"exact", network, payload:{quoteId, amount, payer, txHash}})',
+          ...extra,
         },
       },
     ],
@@ -124,18 +157,26 @@ export function createMockSeller(catalog) {
       if (req.method === 'GET' && url.pathname === '/health') {
         return json(200, { ok: true, id: catalog.id, priceUSDC: catalog.priceUSDC });
       }
+      if (req.method === 'GET' && Object.hasOwn(FIXTURES, url.pathname)) {
+        res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' });
+        res.end(FIXTURES[url.pathname]);
+        return;
+      }
       if (url.pathname !== catalog.path) {
         return json(404, { error: `try ${catalog.path}` });
       }
       if (!['GET', 'POST'].includes(req.method)) return json(405, { error: 'GET or POST' });
       const resource = `${url.origin}${url.pathname}`;
+      const quoteExtra = catalog.resultType
+        ? { resultType: catalog.resultType, result: catalog.resultFor(url) }
+        : {};
       const header = req.headers['x-payment'];
-      if (!header) return paymentRequired(res, resource, catalog, quotes);
+      if (!header) return paymentRequired(res, resource, catalog, quotes, undefined, quoteExtra);
       let paid;
       try {
         paid = verifyPaymentHeader(header, quotes, catalog.priceUSDC);
       } catch (e) {
-        return paymentRequired(res, resource, catalog, quotes, e.message);
+        return paymentRequired(res, resource, catalog, quotes, e.message, quoteExtra);
       }
       const receipt = {
         success: true,
@@ -144,7 +185,8 @@ export function createMockSeller(catalog) {
         paidUSDC: catalog.priceUSDC,
         txHash: paid.txHash,
       };
-      return json(200, catalog.payload(), {
+      const payload = catalog.payload.length ? catalog.payload(url) : catalog.payload();
+      return json(200, payload, {
         'x-payment-response': b64(receipt),
         'access-control-expose-headers': 'X-PAYMENT-RESPONSE',
       });
@@ -166,6 +208,7 @@ export function createMockSeller(catalog) {
             ...catalog,
             origin,
             url: `${origin}${catalog.path}`,
+            badUrl: catalog.resultType ? `${origin}${catalog.path}?delivery=bad` : undefined,
             port: p,
             close: () => new Promise((r) => server.close(r)),
           });
