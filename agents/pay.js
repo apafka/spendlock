@@ -2,10 +2,13 @@
 // 1. Request the URL.
 // 2. If the seller replies 402, check the profile BEFORE paying
 //    (seller allowlist/blocklist, per-tx cap, daily + lifetime budget, approval, kill switch).
-// 3. If allowed, pay from the team's vault (simulated, or local anvil / MockUSDC) and retry with X-PAYMENT.
-// 4. Log every attempt on the team-wide log: paid, blocked + reason, waiting for approval.
+// 3. If the quote is a machine-verifiable result (company-record/v1), run the
+//    deterministic verifier BEFORE any USDC moves. Fail → rejected, not paid.
+// 4. If allowed, pay from the team's vault (simulated, or local anvil / MockUSDC) and retry with X-PAYMENT.
+// 5. Log every attempt on the team-wide log: paid, blocked + reason, waiting for approval, rejected.
 import { checkPay, needsOwnerApproval } from './profiles.js';
 import { encodePayment } from './mock-sellers.js';
+import { COMPANY_RECORD_TYPE, verifyCompanyRecord } from './verify-company.js';
 
 export async function httpRequest(url, { method = 'GET', headers = {}, body } = {}) {
   const payload = body == null
@@ -52,6 +55,41 @@ export function parseX402(body) {
     quoteId: accept.extra?.quoteId,
     seller: accept.extra?.seller || accept.payTo || '',
     description: accept.description || '',
+    resultType: accept.extra?.resultType || '',
+    result: accept.extra?.result || null,
+  };
+}
+
+export function isVerifiableResult(requirement) {
+  return requirement?.resultType === COMPANY_RECORD_TYPE && requirement.result;
+}
+
+export async function verifyQuotedResult(requirement, { live = false } = {}) {
+  if (!isVerifiableResult(requirement)) return null;
+  return verifyCompanyRecord(requirement.result, { live });
+}
+
+function rejectedNotPaid(team, { agent, url, amountUSDC, requirement, memo, report }) {
+  const reason = 'verification failed, not paid';
+  const event = team.pushLog({
+    agentId: agent?.id ?? null,
+    agentName: agent?.name || 'agent',
+    outcome: 'rejected',
+    amountUSDC,
+    sellerUrl: url,
+    seller: sellerLabel(requirement, url),
+    reason,
+    memo,
+  });
+  return {
+    outcome: 'rejected',
+    verified: false,
+    paid: false,
+    reason,
+    amountUSDC,
+    report,
+    requirement,
+    event,
   };
 }
 
@@ -132,6 +170,8 @@ async function settlePayment(team, { agent, url, method, body, requirement, amou
   });
   return {
     outcome: 'paid',
+    verified: isVerifiableResult(requirement) || undefined,
+    paid: true,
     status: paid.status,
     data: paid.body,
     receipt,
@@ -141,8 +181,18 @@ async function settlePayment(team, { agent, url, method, body, requirement, amou
   };
 }
 
+async function verifyOrReject(team, { agent, url, amountUSDC, requirement, memo, live }) {
+  if (!isVerifiableResult(requirement)) return { report: null, rejected: null };
+  const report = await verifyQuotedResult(requirement, { live });
+  if (report?.ok) return { report, rejected: null };
+  return {
+    report,
+    rejected: rejectedNotPaid(team, { agent, url, amountUSDC, requirement, memo, report }),
+  };
+}
+
 /** Make a request. On HTTP 402, enforce the agent profile, then pay and retry. */
-export async function spendlockPay(team, { agent: agentId, url, method = 'GET', body, memo } = {}) {
+export async function spendlockPay(team, { agent: agentId, url, method = 'GET', body, memo, live, requireVerify } = {}) {
   if (!agentId) throw new Error('agent is required');
   if (!url) throw new Error('url is required');
   const agent = team.findAgent(agentId);
@@ -191,6 +241,20 @@ export async function spendlockPay(team, { agent: agentId, url, method = 'GET', 
     return { outcome: 'blocked', reason: decision.reason, amountUSDC, requirement, event };
   }
 
+  if (requireVerify && !isVerifiableResult(requirement)) {
+    const event = team.pushLog({
+      agentId: decision.agent?.id ?? agent?.id ?? null,
+      agentName: decision.agent?.name || agent?.name || String(agentId),
+      outcome: 'blocked',
+      amountUSDC,
+      sellerUrl: url,
+      seller: label,
+      reason: 'seller is not a verifiable result',
+      memo: note,
+    });
+    return { outcome: 'blocked', reason: 'seller is not a verifiable result', amountUSDC, requirement, event };
+  }
+
   if (decision.action === 'approve') {
     const item = team.enqueue({
       agent: decision.agent,
@@ -201,6 +265,7 @@ export async function spendlockPay(team, { agent: agentId, url, method = 'GET', 
       seller: label,
       requirement,
       memo: note,
+      live: Boolean(live),
     });
     const event = team.pushLog({
       agentId: decision.agent.id,
@@ -223,7 +288,17 @@ export async function spendlockPay(team, { agent: agentId, url, method = 'GET', 
     };
   }
 
-  return settlePayment(team, {
+  const { report, rejected } = await verifyOrReject(team, {
+    agent: decision.agent,
+    url,
+    amountUSDC,
+    requirement,
+    memo: note,
+    live,
+  });
+  if (rejected) return rejected;
+
+  const paid = await settlePayment(team, {
     agent: decision.agent,
     url,
     method,
@@ -232,6 +307,16 @@ export async function spendlockPay(team, { agent: agentId, url, method = 'GET', 
     amountUSDC,
     memo: note,
   });
+  if (report) {
+    paid.verified = true;
+    paid.report = report;
+  }
+  return paid;
+}
+
+/** Buy one machine-verifiable result. Payment releases only if the check passes. */
+export async function spendlockBuyVerified(team, opts = {}) {
+  return spendlockPay(team, { ...opts, requireVerify: true });
 }
 
 /** Owner approves a queued x402 payment: re-check every rule, then pay and retry. */
@@ -302,7 +387,16 @@ export async function approvePay(team, requestId, { reason } = {}) {
     memo: item.memo,
     requestId,
   });
-  return settlePayment(team, {
+  const { report, rejected } = await verifyOrReject(team, {
+    agent,
+    url: item.url,
+    amountUSDC: requirement.amountUSDC,
+    requirement,
+    memo: item.memo,
+    live: item.live,
+  });
+  if (rejected) return { ...rejected, requestId };
+  const paid = await settlePayment(team, {
     agent,
     url: item.url,
     method: item.method,
@@ -311,6 +405,11 @@ export async function approvePay(team, requestId, { reason } = {}) {
     amountUSDC: requirement.amountUSDC,
     memo: item.memo,
   });
+  if (report) {
+    paid.verified = true;
+    paid.report = report;
+  }
+  return paid;
 }
 
 export function rejectPay(team, requestId, reason = 'rejected by owner') {

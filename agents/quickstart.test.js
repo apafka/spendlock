@@ -48,7 +48,7 @@ test('MCP snippet is pasteable Cursor / Claude Desktop JSON', () => {
   assert.equal(redacted.mcpServers.spendlock.env.SPENDLOCK_AGENT_KEY, '<your SPENDLOCK_AGENT_KEY>');
 });
 
-test('default scout profile: $0.02 pays, $0.50 waits, $25 over cap', () => {
+test('default scout profile: $0.02 and $0.08 pay, $0.50 waits, $25 over cap', () => {
   const t = createTeam({
     seed: false,
     mode: 'vault',
@@ -57,6 +57,7 @@ test('default scout profile: $0.02 pays, $0.50 waits, $25 over cap', () => {
   const agent = t.upsert({ ...QUICKSTART_AGENT, address: ANVIL.agent.address });
   assert.equal(agent.id, 'scout');
   assert.equal(needsOwnerApproval(agent, 0.02), false);
+  assert.equal(needsOwnerApproval(agent, 0.08), false);
   assert.equal(needsOwnerApproval(agent, 0.5), true);
   assert.equal(t.check('scout', 25, 'http://127.0.0.1:4023/v1/dataset'), 'over per-tx cap');
   assert.equal(t.check('scout', 0.02, 'http://127.0.0.1:4021/v1/price'), '');
@@ -71,16 +72,20 @@ test('help text names the one command and Base Sepolia env vars', () => {
   assert.match(text, /refuses mainnet/i);
 });
 
-test('formatStory prints the three required outcomes', () => {
+test('formatStory prints paid, blocked, waiting, verified, and not-paid', () => {
   const text = formatStory({
     paid: { outcome: 'paid', amountUSDC: 0.02 },
     blocked: { outcome: 'blocked', amountUSDC: 25, reason: 'over per-tx cap' },
     pending: { outcome: 'pending', amountUSDC: 0.5, reason: 'asks owner above $0.1', requestId: 1 },
     approved: { outcome: 'paid', amountUSDC: 0.5 },
+    verified: { outcome: 'paid', amountUSDC: 0.08, verified: true },
+    failed: { outcome: 'rejected', amountUSDC: 0.08, reason: 'verification failed, not paid', paid: false },
     ok: true,
   });
   assert.match(text, /paid/);
   assert.match(text, /blocked/);
   assert.match(text, /pending/);
-  assert.match(text, /OK paid \/ blocked \/ waiting-for-approval/);
+  assert.match(text, /verified company/);
+  assert.match(text, /verification failed, not paid/);
+  assert.match(text, /OK paid \/ blocked \/ waiting-for-approval \/ verified \/ verification failed, not paid/);
 });

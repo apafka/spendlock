@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Spendlock one-command quickstart. Local anvil or Base Sepolia. Play money only.
 #   ./quickstart.sh              start vault + sellers, print MCP config, stay up
-#   ./quickstart.sh --verify     same, then scripted paid / blocked / waiting-for-approval
+#   ./quickstart.sh --verify     same, then scripted paid / blocked / waiting / verified / not-paid
 set -euo pipefail
 export PATH="${HOME}/.foundry/bin:${PATH}"
 ROOT="$(cd "$(dirname "$0")" && pwd)"

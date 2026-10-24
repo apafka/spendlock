@@ -11,10 +11,10 @@ One command starts:
 - a local chain (anvil), or Base Sepolia if you pass your own RPC and test key
 - a Spendlock vault funded with mock / test USDC
 - one agent profile (`scout`) with default limits
-- the three local x402 sellers from this repo
+- the four local x402 sellers from this repo (three immediate pays, one pay-only-if-verified)
 - an MCP snippet to paste into Cursor or Claude Desktop
 
-Then your agent can call `spendlock_status` and `spendlock_pay`. Caps, the approval queue, and the kill switch live **outside** the agent.
+Then your agent can call `spendlock_status`, `spendlock_pay`, and `spendlock_buy_verified`. Caps, the approval queue, the kill switch, and the result check live **outside** the agent.
 
 ## Prerequisites
 
@@ -50,9 +50,10 @@ Sellers (leave this process running so they stay up)
   Price feed         $0.02   http://127.0.0.1:4021/v1/price
   Company data       $0.5    http://127.0.0.1:4022/v1/company
   Expensive dataset  $25     http://127.0.0.1:4023/v1/dataset
+  Verified company   $0.08   http://127.0.0.1:4024/v1/verified-company
 ```
 
-`scout` is the one profile the command creates. Auto-approve is set under **$0.10** on purpose so the three demo sellers show all three outcomes. Raise it to `$50` when you point a real agent at this vault:
+`scout` is the one profile the command creates. Auto-approve is set under **$0.10** on purpose so the demo sellers show paid, waiting, blocked, and pay-only-if-verified. Raise it to `$50` when you point a real agent at this vault:
 
 ```bash
 SPENDLOCK_DATA_DIR=.spendlock/data node agents/spendlock-owner.js profile scout Scout 5 50 100 50
@@ -100,6 +101,8 @@ Use the seller URLs from the quickstart output.
 | `spendlock_pay` agent `scout` url *price feed* | `"outcome": "paid"` · `$0.02` · price tick JSON |
 | `spendlock_pay` agent `scout` url *dataset* | `"outcome": "blocked"` · `"reason": "over per-tx cap"` |
 | `spendlock_pay` agent `scout` url *company data* | `"outcome": "pending"` · waiting for owner approval |
+| `spendlock_buy_verified` agent `scout` url *verified company* | `"outcome": "paid"` · `"verified": true` · `$0.08` |
+| `spendlock_buy_verified` agent `scout` url *verified company?delivery=bad* | `"outcome": "rejected"` · `"reason": "verification failed, not paid"` |
 
 Approve the queued pay (second terminal; leave `./quickstart.sh` running):
 
@@ -112,9 +115,17 @@ Expected after approve: `"outcome": "paid"` · `$0.50` · company snapshot JSON.
 
 That is the whole product: the agent can ask, the vault can say no, and the owner can say yes. The agent cannot raise its cap or skip the queue.
 
+## Pay only if the result verifies
+
+The fourth seller is a **verified company record**: name, domain, and a claim that the domain serves a page whose title or content matches the company name.
+
+`spendlock_buy_verified` (or `spendlock_pay` on that URL) checks the agent profile first. If the spend is allowed, Spendlock runs a **deterministic verifier** against a local fixture page — no live DNS in the default path — and **pays only when the check passes**. A bad delivery (`?delivery=bad`) fails the check and USDC never leaves the vault. Caps and the approval queue still apply: over the per-tx cap is `blocked`; over the approval rule is `pending` until the owner approves, then the check still runs.
+
+Optional `live: true` resolves the domain and fetches its homepage instead of the fixture. CI and `./quickstart.sh --verify` stay offline.
+
 ## 4. Scripted run (no chat client)
 
-Proves the same three outcomes without Cursor:
+Proves the same outcomes without Cursor:
 
 ```bash
 ./quickstart.sh --verify
@@ -128,7 +139,9 @@ MCP story
   expensive dataset $25        blocked · $25 · over per-tx cap
   company data $0.50           pending · $0.5 · asks owner above $0.1 · request #1
   owner approved $0.50         paid · $0.5
-OK paid / blocked / waiting-for-approval
+  verified company $0.08       paid · $0.08 · verified
+  bad company record $0.08     rejected · $0.08 · verification failed, not paid
+OK paid / blocked / waiting-for-approval / verified / verification failed, not paid
 ```
 
 CI runs this on anvil so the path cannot silently break.
@@ -149,7 +162,7 @@ export SPENDLOCK_AGENT_KEY=0x...               # a second test key, or the same 
 ./quickstart.sh
 ```
 
-The command deploys the vault against Circle's test USDC, sets the `scout` policy, allowlists the three **local** mock sellers, and prints an MCP snippet. Your private key is **not** printed; copy it from your environment or from gitignored `.spendlock/mcp.json`.
+The command deploys the vault against Circle's test USDC, sets the `scout` policy, allowlists the four **local** mock sellers, and prints an MCP snippet. Your private key is **not** printed; copy it from your environment or from gitignored `.spendlock/mcp.json`.
 
 If the owner wallet has less than $1000 test USDC, deploy still succeeds and the command tells you to fund the vault after the faucet. The mock sellers stay on localhost — this is a testnet vault plus local 402 endpoints, not a public seller.
 

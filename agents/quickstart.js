@@ -2,7 +2,8 @@
 // One-command Spendlock setup for a developer who builds agents.
 // Local anvil (default) or Base Sepolia if the user supplies RPC + test keys.
 // Deploys the vault, creates one agent profile, starts the mock x402 sellers,
-// prints an MCP snippet, and optionally runs paid / blocked / waiting-for-approval.
+// prints an MCP snippet, and optionally runs paid / blocked / waiting-for-approval
+// plus verified-company paid+verified and verification-failed-not-paid.
 // Testnet and local only. Refuses mainnet. Never writes keys into the git repo.
 import { spawn, execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -35,7 +36,7 @@ export const ANVIL = {
 
 export const BASE_SEPOLIA_USDC = '0x036CbD53842c5426634e7929541eC2318f3dCF7e';
 
-/** One agent. $0.02 pays, $0.50 waits (above $0.10), $25 is over the $5 cap. */
+/** One agent. $0.02 and $0.08 pay, $0.50 waits (above $0.10), $25 is over the $5 cap. */
 export const QUICKSTART_AGENT = {
   id: 'scout',
   name: 'Scout',
@@ -46,7 +47,12 @@ export const QUICKSTART_AGENT = {
   approvalRule: 0.1,
 };
 
-export const SELLER_PORTS = { 'price-feed': 4021, 'company-data': 4022, dataset: 4023 };
+export const SELLER_PORTS = {
+  'price-feed': 4021,
+  'company-data': 4022,
+  dataset: 4023,
+  'verified-company': 4024,
+};
 
 const ERC20_ABI = [
   {
@@ -110,7 +116,7 @@ export function helpText() {
   return `Spendlock quickstart — spend limits your agent can't turn off.
 
   ./quickstart.sh                 local anvil + vault + sellers, print MCP config
-  ./quickstart.sh --verify        same, then scripted paid / blocked / waiting-for-approval
+  ./quickstart.sh --verify        same, then scripted paid / blocked / waiting / verified / not-paid
 
   NETWORK=base-sepolia SPENDLOCK_RPC=... OWNER_PRIVATE_KEY=... SPENDLOCK_AGENT_KEY=... \\
     ./quickstart.sh               deploy to Base Sepolia (your test key + test USDC)
@@ -360,13 +366,22 @@ export async function runMcpStory({ env, sellers }) {
       approved = await approvePay(team, pending.requestId);
     }
 
+    const verifiedSeller = sellers.byId['verified-company'];
+    const verified = await call('spendlock_buy_verified', { agent: 'scout', url: verifiedSeller.url });
+    const failed = await call('spendlock_buy_verified', { agent: 'scout', url: verifiedSeller.badUrl });
+
     const ok = (
       paid.outcome === 'paid'
       && blocked.outcome === 'blocked'
       && blocked.reason === 'over per-tx cap'
       && pending.outcome === 'pending'
+      && verified.outcome === 'paid'
+      && verified.verified === true
+      && failed.outcome === 'rejected'
+      && failed.paid === false
+      && String(failed.reason).includes('verification failed, not paid')
     );
-    return { status, paid, blocked, pending, approved, ok };
+    return { status, paid, blocked, pending, approved, verified, failed, ok };
   } finally {
     await mcp.close();
   }
@@ -376,6 +391,7 @@ export function formatStory(story) {
   const line = (label, r) => {
     const bits = [r?.outcome];
     if (r?.amountUSDC != null) bits.push(`$${r.amountUSDC}`);
+    if (r?.verified === true) bits.push('verified');
     if (r?.reason) bits.push(r.reason);
     if (r?.requestId != null) bits.push(`request #${r.requestId}`);
     return `  ${label.padEnd(28)} ${bits.filter(Boolean).join(' · ')}`;
@@ -386,7 +402,11 @@ export function formatStory(story) {
     line('expensive dataset $25', story.blocked),
     line('company data $0.50', story.pending),
     story.approved ? line('owner approved $0.50', story.approved) : null,
-    story.ok ? 'OK paid / blocked / waiting-for-approval' : 'FAIL expected paid, blocked, pending',
+    story.verified ? line('verified company $0.08', story.verified) : null,
+    story.failed ? line('bad company record $0.08', story.failed) : null,
+    story.ok
+      ? 'OK paid / blocked / waiting-for-approval / verified / verification failed, not paid'
+      : 'FAIL expected paid, blocked, pending, verified, and verification-failed-not-paid',
   ].filter(Boolean).join('\n');
 }
 
@@ -403,12 +423,13 @@ export function printBanner({ network, rpc, deployed, sellers, agent, mcpSnippet
     `funded    $${deployed.fundedUSDC}`,
     `agent     ${agent.id}  ${agent.address}`,
     `limits    $${agent.perTxUSDC}/tx  $${agent.dailyUSDC}/day  $${agent.budgetUSDC} budget`,
-    `approval  auto-approve under $${agent.approvalRule}  →  $0.02 pays, $0.50 waits, $25 blocked`,
+    `approval  auto-approve under $${agent.approvalRule}  →  $0.02/$0.08 pay, $0.50 waits, $25 blocked`,
     '',
     'Sellers (leave this process running so they stay up)',
   ];
   for (const s of sellers.sellers) {
     lines.push(`  ${s.name.padEnd(18)} $${String(s.priceUSDC).padEnd(5)}  ${s.url}`);
+    if (s.badUrl) lines.push(`${''.padEnd(20)} bad delivery      ${s.badUrl}`);
   }
   lines.push('');
   lines.push('Paste this into Cursor (Settings → MCP) or Claude Desktop');
@@ -429,9 +450,13 @@ export function printBanner({ network, rpc, deployed, sellers, agent, mcpSnippet
   const feed = sellers.byId['price-feed']?.url;
   const data = sellers.byId.dataset?.url;
   const company = sellers.byId['company-data']?.url;
+  const verified = sellers.byId['verified-company']?.url;
+  const failed = sellers.byId['verified-company']?.badUrl;
   if (feed) lines.push(`  2. spendlock_pay  agent=scout  url=${feed}     → paid`);
   if (data) lines.push(`  3. spendlock_pay  agent=scout  url=${data}   → blocked (over per-tx cap)`);
   if (company) lines.push(`  4. spendlock_pay  agent=scout  url=${company}   → waiting for approval`);
+  if (verified) lines.push(`  5. spendlock_buy_verified  agent=scout  url=${verified}  → paid + verified`);
+  if (failed) lines.push(`  6. spendlock_buy_verified  agent=scout  url=${failed}  → verification failed, not paid`);
   lines.push('');
   lines.push('Approve a queued pay (same data dir this process wrote):');
   lines.push(`  SPENDLOCK_DATA_DIR=${join(stateDir, 'data')} node agents/spendlock-owner.js queue`);
@@ -596,6 +621,8 @@ async function main() {
         blocked: result.story.blocked.outcome,
         pending: result.story.pending.outcome,
         approved: result.story.approved?.outcome ?? null,
+        verified: result.story.verified?.outcome ?? null,
+        failed: result.story.failed?.outcome ?? null,
       },
     }, null, 2));
   } else {

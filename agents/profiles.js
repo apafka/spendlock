@@ -308,7 +308,7 @@ export function createTeam(opts = {}) {
       }
       return { action: 'pay', reason: 'within rules', agent };
     },
-    enqueue({ agent, url, method, body, amountUSDC, seller, requirement, memo }) {
+    enqueue({ agent, url, method, body, amountUSDC, seller, requirement, memo, live }) {
       const id = state.nextRequestId++;
       const item = {
         id,
@@ -321,6 +321,7 @@ export function createTeam(opts = {}) {
         seller: seller || '',
         requirement: requirement || null,
         memo: memo || '',
+        live: Boolean(live),
         createdAt: new Date().toISOString(),
         status: 'pending',
       };
